@@ -18,7 +18,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
-import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
@@ -36,14 +35,15 @@ import javafx.stage.Stage;
 public class Main extends Application {
 
 	private static final long serialVersionUID = 1L;
-	public static final int MAIN_WIDTH = 960;
-	public static final int MAIN_HEIGHT = 640;
+	public static final int MAIN_WIDTH = 1120;
+	public static final int MAIN_HEIGHT = 680;
 	
 	public static MysqlConnector mysqlConnector;
 	
 	private Stage primaryStage;
 	
-	ObservableList packData = FXCollections.observableArrayList();
+	ObservableList employeeData = FXCollections.observableArrayList();
+	ObservableList employeeInfoData = FXCollections.observableArrayList();
 	ObservableList lastOperationData = FXCollections.observableArrayList();
 	
 	Button laoButton;
@@ -61,6 +61,11 @@ public class Main extends Application {
 	
 	Label lengthLabel = new Label("Paki pikkus: ");
 	Label diameterLabel = new Label("Paki diameeter: ");
+	
+	Label employeeAmtOfImmutamata;
+	Label employeeAmtOfImmutatud;
+	Label employeeAmtOfLaaditud;
+	
 	
 	static Label errorMessage = new Label();
 	
@@ -172,20 +177,33 @@ public class Main extends Application {
 		
 		//Packtype informations...
 		
-		FlowPane packageInfoPanel = new FlowPane();
-		packageInfoPanel.setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.DASHED, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
-		packageInfoPanel.setPadding(new Insets(10));
+		FlowPane employeeInfoPanel = new FlowPane();
+		employeeInfoPanel.setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.DASHED, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
+		employeeInfoPanel.setPadding(new Insets(10));
 		
-		ListView packTypesListView = new ListView(packData);
-		packTypesListView.setPrefHeight(200);
+		ListView employeeListView = new ListView(employeeData);
+		employeeListView.setPrefHeight(200);
+		ListView employeeDataListView = new ListView(employeeInfoData);
+		employeeDataListView.setPrefHeight(200);
+		employeeDataListView.setPrefWidth(400);
+		employeeListView.getSelectionModel().selectedItemProperty().addListener(new OnListViewItemChange(this));
 		
-		packageInfoPanel.getChildren().add(packTypesListView);
+		VBox additionalEmployeePanel = new VBox();
+		additionalEmployeePanel.setSpacing(30);
+		employeeAmtOfImmutamata = new Label("Pakke lattu tootnud(7 päeva): ");
+		employeeAmtOfImmutatud = new Label("Pakke immutatud    (7 päeva): ");
+		employeeAmtOfLaaditud = new Label("Pakke laaditud     (7 päeva): ");
+		employeeAmtOfImmutamata.setFont(new Font("Calibri", 15));
+		employeeAmtOfImmutatud.setFont(new Font("Calibri", 15));
+		employeeAmtOfLaaditud.setFont(new Font("Calibri", 15));
+		additionalEmployeePanel.getChildren().addAll(employeeAmtOfImmutamata, employeeAmtOfImmutatud, employeeAmtOfLaaditud);
+		
+		employeeInfoPanel.getChildren().addAll(employeeListView, employeeDataListView, additionalEmployeePanel);
 		
 		//Last actions info
 		FlowPane lastActionsPanel = new FlowPane();
 		ListView lastActionsListView = new ListView(lastOperationData);
 		lastActionsPanel.getChildren().add(lastActionsListView);
-		
 		
 		
 		//Add components to...
@@ -198,7 +216,7 @@ public class Main extends Application {
 		
 		VBox centerPanel = new VBox();
 		centerPanel.setSpacing(10);
-		centerPanel.getChildren().addAll(packageInfoPanel, lastActionsListView);
+		centerPanel.getChildren().addAll(employeeInfoPanel, lastActionsListView);
 		
 		
 		mainPanel.setLeft(leftPanel);
@@ -222,7 +240,7 @@ public class Main extends Application {
 	}
 	
 	public void initialize(){
-		updatePackagePanel();
+		updateEmployeePanel();
 		updateLastActionPanel();
 	}
 	
@@ -237,20 +255,31 @@ public class Main extends Application {
 	
 	public Main(){}
 	
-	private void updatePackagePanel(){
-		List<String> packages = MysqlConnector.getPostTypes();
+	private void updateEmployeePanel(){
+		employeeData.clear();
+		List<String> packages = MysqlConnector.getEmployeeNames();
 		
 		for(String s : packages){
-			packData.add(s);
+			employeeData.add(s);
 		}
 
 	}
 	
 	private void updateLastActionPanel(){
+		lastOperationData.clear();
 		List<String> lastActionData = MysqlConnector.getLastOperationsData();
 		for(String s : lastActionData){
 			lastOperationData.add(s);
 		}
+	}
+	
+	private void updateEmployeeDataPanel(String employeeName){
+		employeeInfoData.clear();
+		List<String> employeeInfo = MysqlConnector.getPackOperationDataByEmployee(employeeName);
+		for(String s : employeeInfo){
+			employeeInfoData.add(s);
+		}
+		
 	}
 	
 	
@@ -336,10 +365,30 @@ public class Main extends Application {
 				MysqlConnector.insertEmployee(employeeNameField.getText());
 				Main.showSucessMessage("Töötaja lisatud!");
 			}
+			
+			main.initialize();
 		}
 
 	
 		
 	}
+	
+	private class OnListViewItemChange implements ChangeListener<String> {
+
+		Main main;
+		public OnListViewItemChange(Main main) {
+			this.main = main;
+		}
+		
+		@Override
+		public void changed(ObservableValue<? extends String> ov, String oldValue, String newValue) {
+			main.updateEmployeeDataPanel(newValue);
+			employeeAmtOfImmutamata.setText("Pakke lattu tootnud(7 päeva): " + MysqlConnector.getPackImmutamatAmountByEmployee(newValue, 7));
+			employeeAmtOfImmutatud.setText("Pakke immutatud    (7 päeva): " + MysqlConnector.getPackImmutatudAmountByEmployee(newValue, 7));
+			employeeAmtOfLaaditud.setText("Pakke laaditud     (7 päeva): " + MysqlConnector.getPackLaaditudAmountByEmployee(newValue, 7));
+		}
+		
+	}
+	
 
 }

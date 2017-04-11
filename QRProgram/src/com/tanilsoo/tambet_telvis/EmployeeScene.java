@@ -44,6 +44,7 @@ public class EmployeeScene {
 		
 		HBox headerBox = Main.getMainHeaderBox();
 		Button backButton = new Button("Tagasi");
+		backButton.setPrefSize(100, 20);
 		backButton.setOnAction(e -> main.getPrimaryStage().setScene(main.getMainScene()));
 		headerBox.getChildren().add(backButton);
 		

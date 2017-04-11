@@ -6,7 +6,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Time;
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +38,34 @@ public class MysqlConnector {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public static int getPackImmutamatAmountByEmployee(String employeeName, int days){
+		return getPackAmountByEmployee(employeeName, 2, days);
+	}
+	
+	public static int getPackImmutatudAmountByEmployee(String employeeName, int days){
+		return getPackAmountByEmployee(employeeName, 3, days);
+	}
+	
+	public static int getPackLaaditudAmountByEmployee(String employeeName, int days){
+		return getPackAmountByEmployee(employeeName, 4, days);
+	}
+	
+	public static int getPackAmountByEmployee(String employeeName, int operation, int days){
+		String query = "SELECT COUNT(*) FROM pack_operations, employee WHERE pack_operations.employee_id=employee.id AND "
+				+ "employee.name='" + employeeName + "' AND pack_operations.operation=" + operation + " AND "
+				+ "time > DATE_SUB(NOW(), INTERVAL " + days + " DAY) ORDER BY time DESC";
+		try{
+			ResultSet result = statment.executeQuery(query);
+			if(result.next()){
+				return result.getInt(1);
+			}
+		} catch(SQLException e){
+			e.printStackTrace();
+		}
+		/* Error handling... */
+		return -1;
 	}
 	
 	public static List<String> getUniqueFiles(){
@@ -85,14 +117,26 @@ public class MysqlConnector {
 		}
 	}
 	
+	public static List<String> getPackOperationDataByEmployee(String employeeName){
+		String query = "SELECT employee.name, post_type.length, post_type.diameter, post_type.puu, pack_operations.operation, pack_operations.time "
+				+ "FROM employee,post_type, pack_operations WHERE pack_operations.employee_id=employee.id AND post_type.id=pack_operations.pack_id "
+				+ "AND employee.name='" + employeeName + "' ORDER BY time DESC";
+		return lastOperations(query);
+	}
+	
 	public static List<String> getLastOperationsData(){
 		String query = "SELECT employee.name, post_type.length, post_type.diameter, post_type.puu, pack_operations.operation, pack_operations.time "
 				+ "FROM employee,post_type, pack_operations WHERE pack_operations.employee_id=employee.id AND post_type.id=pack_operations.pack_id ORDER BY time DESC";
+		return lastOperations(query);
+	}
+	
+	public static List<String> lastOperations(String query){
 		List<String> data = new ArrayList<String>();
 		try{
 			ResultSet result = statment.executeQuery(query);
 			while(result.next()){
-				Time time = result.getTime(6);
+				Timestamp time = result.getTimestamp(6);
+				
 				String operation = "";
 				if(result.getInt(5) == 2){
 					operation = "ladu";
