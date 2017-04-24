@@ -15,17 +15,16 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
-public class LaoScene {
+public class LaoScene implements Scenable {
 	
 	Main main;
 	
 	public LaoScene(Main main){
 		this.main = main;
-		setLaoScene();
 	}
 
-	
-	public void setLaoScene(){
+	@Override
+	public void setScene(){
 		BorderPane borderPanel = new BorderPane();
 		
 		HBox headerBox = Main.getMainHeaderBox();

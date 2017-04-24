@@ -5,12 +5,8 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Time;
 import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +34,31 @@ public class MysqlConnector {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+	}
+	//name(str), length(int), diameter(int), puu(char), amt_packs(int), price(int), additional_info(str)
+	public static List<List<String>> getPackOrder(){
+		String query = "SELECT pack_order.name, post_type.length, post_type.diameter, post_type.puu, "
+				+ "pack_order.amt_packs, pack_order.price, pack_order.additional_info FROM pack_order, post_type "
+				+ "WHERE pack_order.post_type = post_type.id";
+		List<List<String>> data = new ArrayList<List<String>>();
+		try {
+			ResultSet result = statment.executeQuery(query);
+			while(result.next()){
+				List<String> row = new ArrayList<String>();
+				row.add(result.getString(1));
+				row.add(String.valueOf(result.getInt(2)));
+				row.add(String.valueOf(result.getInt(3)));
+				row.add(result.getString(4));
+				row.add(String.valueOf(result.getInt(5)));
+				row.add(String.valueOf(result.getInt(6)));
+				row.add(result.getString(7));
+				data.add(row);
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return data;
 	}
 	
 	public static int getPackImmutamatAmountByEmployee(String employeeName, int days){

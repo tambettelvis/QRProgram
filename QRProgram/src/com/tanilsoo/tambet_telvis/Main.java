@@ -19,6 +19,8 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.BorderStroke;
@@ -46,6 +48,7 @@ public class Main extends Application {
 	ObservableList employeeInfoData = FXCollections.observableArrayList();
 	ObservableList lastOperationData = FXCollections.observableArrayList();
 	
+	Button jobsButton;
 	Button laoButton;
 	Button addPackButton;
 	Button addNewEmployeeBtn;
@@ -105,8 +108,12 @@ public class Main extends Application {
 		employeeChartButton = new Button("Töötjad");
 		employeeChartButton.setPrefSize(100, 20);
 		employeeChartButton.setOnAction(new OnButtonClicked(this));
+		jobsButton = new Button("Tööde nimekiri");
+		jobsButton.setPrefSize(100, 20);
+		jobsButton.setOnAction(new OnButtonClicked(this));
 		headerBox.getChildren().add(laoButton);
 		headerBox.getChildren().add(employeeChartButton);
+		headerBox.getChildren().add(jobsButton);
 		
 		//Add new packageType
 		VBox packAddGroup = new VBox();
@@ -249,6 +256,8 @@ public class Main extends Application {
 		headerBox.setPadding(new Insets(20));
 		headerBox.setSpacing(10);
 		headerBox.setStyle("-fx-background-color: #d9b38c;");
+		ImageView img = new ImageView(new Image("file:woodmaster.png"));
+		//headerBox.set
 		return headerBox;
 	}
 	
@@ -315,8 +324,10 @@ public class Main extends Application {
 			if(e.getSource() == laoButton){
 				//TODO Show graphs... or something
 				LaoScene laoScene = new LaoScene(main);
+				laoScene.setScene();
 			} else if(e.getSource() == employeeChartButton){
 				EmployeeScene employeeScene = new EmployeeScene(main);
+				employeeScene.setScene();
 			} else if(e.getSource() == addPackButton){
 				if(packageLength.getText().equals("") || packageDiameter.getText().equals("") || uniqueFileField.getText().equals("")){
 					Main.showErrorMessage("Sisesta tekst!");
@@ -364,6 +375,9 @@ public class Main extends Application {
 				
 				MysqlConnector.insertEmployee(employeeNameField.getText());
 				Main.showSucessMessage("Töötaja lisatud!");
+			} else if(e.getSource() == jobsButton) {
+				JobsScene jobsScene = new JobsScene(main);
+				jobsScene.setScene();
 			}
 			
 			main.initialize();

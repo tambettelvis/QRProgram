@@ -14,7 +14,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-public class EmployeeScene {
+public class EmployeeScene implements Scenable {
 	
 	Button dayButton;
 	Button weekButton;
@@ -30,11 +30,14 @@ public class EmployeeScene {
 
 	public EmployeeScene(Main main){
 		this.main = main;
-		
-		updateData(1);
 	}
 	
-	private void updateData(int days){
+	/** Default 1 day scene. */
+	public void setScene(){
+		setScene(1);
+	}
+	
+	public void setScene(int days){
 		
 		BorderPane borderPanel = new BorderPane();
 		
@@ -51,9 +54,9 @@ public class EmployeeScene {
 		Button dayButton = new Button("1 Päev");
 		Button weekButton = new Button("Nädal");
 		Button monthButton = new Button("Kuu");
-		dayButton.setOnAction(e -> updateData(1));
-		weekButton.setOnAction(e -> updateData(7));
-		monthButton.setOnAction(e -> updateData(30));
+		dayButton.setOnAction(e -> setScene(1));
+		weekButton.setOnAction(e -> setScene(7));
+		monthButton.setOnAction(e -> setScene(30));
 		dayButton.setPrefSize(100, 20);
 		weekButton.setPrefSize(100, 20);
 		monthButton.setPrefSize(100, 20);
@@ -99,6 +102,7 @@ public class EmployeeScene {
 		main.getPrimaryStage().setScene(scene);
 		
 	}
+
 
 	
 }
