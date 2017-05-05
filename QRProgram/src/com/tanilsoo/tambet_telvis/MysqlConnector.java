@@ -13,9 +13,9 @@ import java.util.Map;
 
 public class MysqlConnector {
 
-	private static final String SERVER_IP = "localhost";
-	private static final String USER = "root";
-	private static final String PASSWORD = "";
+	private static final String SERVER_IP = "www.medesteetika.ee:3306";
+	private static final String USER = "client";
+	private static final String PASSWORD = "Laud1234";
 	private static final String DATABASE = "qrinfo";
 	
 	private static boolean connected = false;

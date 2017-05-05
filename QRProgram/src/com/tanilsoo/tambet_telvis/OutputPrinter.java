@@ -39,12 +39,12 @@ public class OutputPrinter implements Printable {
 		Graphics2D g2d = (Graphics2D) g;
 		int x = (int) pf.getImageableX();
 		int y = (int) pf.getImageableY();
-		g2d.setColor(Color.BLACK);
-		g2d.translate(x, y);
+		//g2d.setColor(Color.BLACK);
+		//g2d.translate(x, y);
 		
 		BufferedImage bi = null;
 		try {
-			bi = ImageIO.read(new File("qr2.jpg"));
+			bi = ImageIO.read(new File(imageFileName));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

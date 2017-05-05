@@ -2,6 +2,7 @@ package com.tanilsoo.tambet_telvis;
 
 import java.util.List;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -76,7 +77,10 @@ public class Main extends Application {
 	
 	public static void main(String[] args){
 		mysqlConnector = new MysqlConnector();
-		//Main frame = new Main();
+		//Main frame = new Main();'
+		
+		ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(3);
+		executor.scheduleAtFixedRate(new CheckPrinter(), 0L, 10000, TimeUnit.MILLISECONDS);
 		
 		launch(args);
 		
@@ -85,10 +89,6 @@ public class Main extends Application {
 			JOptionPane.showOptionDialog(frame, "Ei saanud ühendust MySQL serveriga. Kas ühendan uuesti?", "Error", JOptionPane.YES_NO_OPTION,
 					JOptionPane.ERROR_MESSAGE,null, str, "Jah");*/
 		}
-		
-		ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(3);
-		//executor.scheduleAtFixedRate(new CheckPrinter(mysqlConnector), 0L, 10000, TimeUnit.MILLISECONDS);
-		
 		
 	}
 	
@@ -236,7 +236,7 @@ public class Main extends Application {
 		
 		mainScene = new Scene(mainPanel, MAIN_WIDTH, MAIN_HEIGHT);
 		primaryStage.setScene(mainScene);
-		primaryStage.setOnCloseRequest(e -> Platform.exit());
+		primaryStage.setOnCloseRequest(e -> closeApplication());
 		primaryStage.show();
 		
 		initialize();
@@ -247,6 +247,12 @@ public class Main extends Application {
 		
 	}
 	
+	private void closeApplication() {
+		Platform.exit();
+		System.exit(0);
+	}
+
+
 	public void initialize(){
 		updateEmployeePanel();
 		updateLastActionPanel();
