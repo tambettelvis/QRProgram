@@ -38,7 +38,7 @@ public class MysqlConnector {
 	//name(str), length(int), diameter(int), puu(char), amt_packs(int), price(int), additional_info(str)
 	public static List<List<String>> getPackOrder(){
 		String query = "SELECT pack_order.name, post_type.length, post_type.diameter, post_type.puu, "
-				+ "pack_order.amt_packs, pack_order.price, pack_order.additional_info FROM pack_order, post_type "
+				+ "pack_order.amt_packs, pack_order.price, pack_order.additional_info, pack_order.packs_done FROM pack_order, post_type "
 				+ "WHERE pack_order.post_type = post_type.id";
 		List<List<String>> data = new ArrayList<List<String>>();
 		try {
@@ -52,6 +52,7 @@ public class MysqlConnector {
 				row.add(String.valueOf(result.getInt(5)));
 				row.add(String.valueOf(result.getInt(6)));
 				row.add(result.getString(7));
+				row.add(String.valueOf(result.getInt(8)));
 				data.add(row);
 			}
 		} catch (SQLException e) {
@@ -59,6 +60,12 @@ public class MysqlConnector {
 			e.printStackTrace();
 		}
 		return data;
+	}
+	
+	public static void insertOrder(String name, int postType, int amtOfPacks, int price, String additionalInfo){
+		String query = String.format("INSERT INTO pack_order(name, post_type, amt_packs, price, additional_info) "
+				+ "VALUES('%s', %d, %d, %d, '%s')", name, postType, amtOfPacks, price, additionalInfo);
+		insert(query);
 	}
 	
 	public static int getPackImmutamatAmountByEmployee(String employeeName, int days){

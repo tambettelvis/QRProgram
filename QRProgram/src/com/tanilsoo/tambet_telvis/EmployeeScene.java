@@ -50,6 +50,7 @@ public class EmployeeScene implements Scenable {
 		backButton.setPrefSize(100, 20);
 		backButton.setOnAction(e -> main.getPrimaryStage().setScene(main.getMainScene()));
 		headerBox.getChildren().add(backButton);
+		Main.addLogoToHeaderBox(headerBox);
 		
 		Button dayButton = new Button("1 Päev");
 		Button weekButton = new Button("Nädal");

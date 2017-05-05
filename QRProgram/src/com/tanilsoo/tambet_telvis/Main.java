@@ -114,6 +114,7 @@ public class Main extends Application {
 		headerBox.getChildren().add(laoButton);
 		headerBox.getChildren().add(employeeChartButton);
 		headerBox.getChildren().add(jobsButton);
+		addLogoToHeaderBox(headerBox);
 		
 		//Add new packageType
 		VBox packAddGroup = new VBox();
@@ -257,8 +258,14 @@ public class Main extends Application {
 		headerBox.setSpacing(10);
 		headerBox.setStyle("-fx-background-color: #d9b38c;");
 		ImageView img = new ImageView(new Image("file:woodmaster.png"));
-		//headerBox.set
 		return headerBox;
+	}
+	
+	public static void addLogoToHeaderBox(HBox headerBox){
+		ImageView img = new ImageView(new Image("file:woodmaster.png"));
+		img.setFitWidth(85);
+		img.setFitHeight(43);
+		headerBox.getChildren().add(img);
 	}
 	
 	

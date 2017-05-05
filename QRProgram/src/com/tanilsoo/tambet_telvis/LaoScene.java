@@ -33,6 +33,7 @@ public class LaoScene implements Scenable {
 		backBtn.setPrefSize(100, 20);
 		//backBtn.setOnAction(new OnButtonClicked());
 		headerBox.getChildren().add(backBtn);
+		Main.addLogoToHeaderBox(headerBox);
 		
 		TabPane tabPanel = new TabPane();
 		Tab tab1 = new Tab("Tavaline");
