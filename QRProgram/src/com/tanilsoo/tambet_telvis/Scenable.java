@@ -1,7 +1,9 @@
 package com.tanilsoo.tambet_telvis;
 
+import javafx.scene.Scene;
+
 public interface Scenable {
 	
-	void setScene();
+	public Scene createScene();
 
 }

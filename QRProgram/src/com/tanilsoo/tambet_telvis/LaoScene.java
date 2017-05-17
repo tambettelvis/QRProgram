@@ -2,7 +2,6 @@ package com.tanilsoo.tambet_telvis;
 
 import java.util.Map;
 
-import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
@@ -13,27 +12,19 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.stage.Stage;
 
 public class LaoScene implements Scenable {
 	
-	Main main;
-	
-	public LaoScene(Main main){
-		this.main = main;
-	}
 
 	@Override
-	public void setScene(){
+	public Scene createScene(){
 		BorderPane borderPanel = new BorderPane();
 		
-		HBox headerBox = Main.getMainHeaderBox();
+		
 		Button backBtn = new Button("Tagasi");
-		backBtn.setOnAction(e -> main.getPrimaryStage().setScene(main.getMainScene()));
+		backBtn.setOnAction(e -> SceneBuilder.setNewScene(new MainScene()));
 		backBtn.setPrefSize(100, 20);
-		//backBtn.setOnAction(new OnButtonClicked());
-		headerBox.getChildren().add(backBtn);
-		Main.addLogoToHeaderBox(headerBox);
+		BorderPane header = MainScene.createHeader(backBtn);
 		
 		TabPane tabPanel = new TabPane();
 		Tab tab1 = new Tab("Tavaline");
@@ -79,9 +70,9 @@ public class LaoScene implements Scenable {
 		tab2.setContent(barChart2);
 		tabPanel.getTabs().addAll(tab1, tab2);
 		borderPanel.setCenter(tabPanel);
-		borderPanel.setTop(headerBox);
+		borderPanel.setTop(header);
 
-		main.getPrimaryStage().setScene(scene);
+		return scene;
 	}
 	
 	

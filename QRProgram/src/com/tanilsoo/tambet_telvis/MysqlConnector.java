@@ -13,9 +13,9 @@ import java.util.Map;
 
 public class MysqlConnector {
 
-	private static final String SERVER_IP = "www.medesteetika.ee:3306";
-	private static final String USER = "client";
-	private static final String PASSWORD = "Laud1234";
+	private static final String SERVER_IP = "localhost";
+	private static final String USER = "root";
+	private static final String PASSWORD = "";
 	private static final String DATABASE = "qrinfo";
 	
 	private static boolean connected = false;
@@ -35,6 +35,24 @@ public class MysqlConnector {
 			e.printStackTrace();
 		}
 	}
+	
+	public static void insertNewJob(String description, int priority){
+		String query1 = "UPDATE jobs SET priority=priority+1 WHERE priority>=" + priority;
+		String query2 = String.format("INSERT INTO jobs(job_desc, priority) VALUES('%s', %d)", description, priority);
+		insert(query1);
+		insert(query2);
+	}
+	
+	public static void updateTavalisi(int packId, int amount){
+		String query = String.format("UPDATE laos_tavalisi_pakke SET amount=%d WHERE pack_id=%d", packId, amount);
+		insert(query);
+	}
+	
+	public static void updateImmutatud(int packId, int amount){
+		String query = String.format("UPDATE laos_immutatud_pakke SET amount=%d WHERE pack_id=%d", packId, amount);
+		insert(query);
+	}
+	
 	//name(str), length(int), diameter(int), puu(char), amt_packs(int), price(int), additional_info(str)
 	public static List<List<String>> getPackOrder(){
 		String query = "SELECT pack_order.name, post_type.length, post_type.diameter, post_type.puu, "
