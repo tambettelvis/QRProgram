@@ -19,12 +19,7 @@ public class LaoScene implements Scenable {
 	@Override
 	public Scene createScene(){
 		BorderPane borderPanel = new BorderPane();
-		
-		
-		Button backBtn = new Button("Tagasi");
-		backBtn.setOnAction(e -> SceneBuilder.setNewScene(new MainScene()));
-		backBtn.setPrefSize(100, 20);
-		BorderPane header = MainScene.createHeader(backBtn);
+		BorderPane header = Main.getHeader();
 		
 		TabPane tabPanel = new TabPane();
 		Tab tab1 = new Tab("Tavaline");

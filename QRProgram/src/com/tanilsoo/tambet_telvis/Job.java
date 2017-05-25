@@ -8,25 +8,57 @@ public class Job {
 	private int priority;
 	private String description;
 	
-	List<Job> jobs = new ArrayList<Job>();
+	public static List<Job> jobs = new ArrayList<Job>();
 	
-	public Job(int priority, String description){
+	public Job(String description, int priority){
 		this.priority = priority;
 		this.description = description;
-		if(doesSamePriorityExists()){
+		jobs.add(this);
+	}
+	
+	public Job(String description, int priority, boolean saveToDatabase){
+		this.priority = priority;
+		this.description = description;
+		
+		if(saveToDatabase){
 			updateJobsPriorities();
-			updateDatabase();
+			addToDatabase();
 		}
 		jobs.add(this);
 	}
 	
-	private void updateDatabase(){
+	public void updatePriority(boolean priorityDecrease){
+		int jobPriority; //Job priority that we will compare with.
+		if(priorityDecrease){
+			jobPriority = this.priority - 1;
+		} else {
+			jobPriority = this.priority + 1;
+		}
+		
+		for(Job job : jobs){
+			if(job.getPriority() == jobPriority){
+				if(priorityDecrease){
+					job.setPriority(job.getPriority() + 1);
+					this.priority -= 1;
+				} else {
+					job.setPriority(job.getPriority() - 1);
+					this.priority += 1;
+				}
+				MysqlConnector.setJobPriority(job.getDescription(), job.getPriority());
+				MysqlConnector.setJobPriority(this.description, this.priority);
+				
+				break;
+			}
+		}
+	}
+	
+	private void addToDatabase(){
 		MysqlConnector.insertNewJob(this.description, this.priority);
 	}
 	
 	private void updateJobsPriorities(){
 		for(Job job : jobs){
-			if(job.getPriority() >= this.priority){
+			if(job.getPriority() >= this.priority && job != this){
 				job.setPriority(job.getPriority() + 1);
 			}
 		}		
@@ -49,4 +81,7 @@ public class Job {
 		this.priority = amt;
 	}
 	
+	public String getDescription(){
+		return this.description;
+	}
 }

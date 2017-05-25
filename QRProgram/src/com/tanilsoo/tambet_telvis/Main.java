@@ -46,6 +46,7 @@ public class Main extends Application {
 	
 	public static Stage primaryStage;
 	Scene mainScene;
+	static BorderPane header;
 	
 	public static void main(String[] args){
 		mysqlConnector = new MysqlConnector();
@@ -54,6 +55,7 @@ public class Main extends Application {
 		ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(3);
 		//executor.scheduleAtFixedRate(new CheckPrinter(), 0L, 10000, TimeUnit.MILLISECONDS);
 		
+		header = createHeader();
 		launch(args);
 		
 		if(!MysqlConnector.isConnected()){
@@ -90,8 +92,7 @@ public class Main extends Application {
 
 
 	public static void initialize(){
-		updateEmployeePanel();
-		updateLastActionPanel();
+		
 	}
 	
 	
@@ -105,33 +106,43 @@ public class Main extends Application {
 		primaryStage.setScene(scene);
 	}
 	
-	private static void updateEmployeePanel(){
-		MainScene.employeeData.clear();
-		List<String> packages = MysqlConnector.getEmployeeNames();
+	private static BorderPane createHeader(){
+		BorderPane header = new BorderPane();
+		header.setStyle("-fx-background-color: #d9b38c;");
 		
-		for(String s : packages){
-			MainScene.employeeData.add(s);
-		}
-
-	}
-	
-	public static void updateLastActionPanel(){
-		MainScene.lastOperationData.clear();
-		List<String> lastActionData = MysqlConnector.getLastOperationsData();
-		for(String s : lastActionData){
-			MainScene.lastOperationData.add(s);
-		}
-	}
-	
-	public static void updateEmployeeDataPanel(String employeeName){
-		MainScene.employeeInfoData.clear();
-		List<String> employeeInfo = MysqlConnector.getPackOperationDataByEmployee(employeeName);
-		for(String s : employeeInfo){
-			MainScene.employeeInfoData.add(s);
-		}
+		HBox headerBox = new HBox();
+		headerBox.setPadding(new Insets(20));
+		headerBox.setSpacing(20);
+		headerBox.getChildren().addAll(
+				new HeaderButton("HOME", new MainScene()),
+				new HeaderButton("LADU", new LaoScene()),
+				new HeaderButton("T÷÷TAJAD", new EmployeeScene()),
+				new HeaderButton("TELLIMUSED", new OrdersScene()),
+				new HeaderButton("T÷÷DE NIMEKIRI", new JobsScene()),
+				new HeaderButton("SEADED", new SettingsScene()),
+				new HeaderButton("RAW DATA", new RawDataScene())
+				);
 		
-	
+		HBox imgPanel = new HBox();
+		imgPanel.setPadding(new Insets(10));
+		ImageView img = new ImageView(new Image("file:woodmaster.png"));
+		img.setFitWidth(85);
+		img.setFitHeight(43);
+		imgPanel.getChildren().add(img);
+		
+		
+		header.setLeft(headerBox);
+		header.setRight(imgPanel);
+		
+		return header;
 	}
+	
+	
+	public static BorderPane getHeader(){
+		return header;
+	}
+	
+	
 	
 
 }

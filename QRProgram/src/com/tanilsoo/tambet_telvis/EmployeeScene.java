@@ -46,11 +46,7 @@ public class EmployeeScene implements Scenable {
 		leftPanel.setPadding(new Insets(10));
 		leftPanel.setSpacing(10);
 		
-		
-		Button backButton = new Button("Tagasi");
-		backButton.setPrefSize(100, 20);
-		backButton.setOnAction(e -> SceneBuilder.setNewScene(new MainScene()));
-		BorderPane header = MainScene.createHeader(backButton);
+		BorderPane header = Main.getHeader();
 		
 		Button dayButton = new Button("1 Päev");
 		Button weekButton = new Button("Nädal");

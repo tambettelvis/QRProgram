@@ -15,7 +15,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
-public class ChangeDatabaseScene implements Scenable {
+public class SettingsScene implements Scenable {
 
 	ComboBox<String> postTypes;
 	ComboBox<Integer> amountComboBox;
@@ -24,7 +24,7 @@ public class ChangeDatabaseScene implements Scenable {
 	Map<String, Integer> tavaPacks;
 	Map<String, Integer> immutatudPacks;
 	
-	public ChangeDatabaseScene() {
+	public SettingsScene() {
 		postTypes = new ComboBox<String>(OrdersScene.getPostTypeItems());
 		postTypes.valueProperty().addListener(new OnComboBoxValueChange());
 		amountComboBox = new ComboBox<Integer>(OrdersScene.getComboBoxItems(100));
@@ -37,11 +37,7 @@ public class ChangeDatabaseScene implements Scenable {
 	@Override
 	public Scene createScene() {
 		BorderPane mainPanel = new BorderPane();
-		
-		Button backButton = new Button("Tagasi");
-		backButton.setPrefSize(100, 20);
-		backButton.setOnAction(event -> SceneBuilder.setNewScene(new MainScene()));
-		BorderPane header = MainScene.createHeader(backButton);
+		BorderPane header = Main.getHeader();
 		
 		Button saveButton = new Button("Salvesta");
 		saveButton.setOnAction(new OnButtonClicked(11));

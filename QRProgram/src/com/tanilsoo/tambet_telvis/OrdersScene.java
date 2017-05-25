@@ -32,24 +32,25 @@ public class OrdersScene implements Scenable {
 	ComboBox packAmount;
 	ComboBox postTypes;
 	
-	TableView tableView = new TableView();
-	TableView jobTableView = new TableView();
+	TableView<Order> tableView = new TableView<Order>();
 	Button addNewOrderButton = new Button("Lisa");
+	Button removeOrderButton = new Button("Eemalda");
 	
 	public OrdersScene() {
 		packAmount = new ComboBox(getComboBoxItems(100));
 		postTypes = new ComboBox(getPostTypeItems());
+		createOrderTableView();
+	}
+	
+	private void init(){
 		updateOrderList();
 	}
 	
 	@Override
 	public Scene createScene() {
+		init();
 		BorderPane borderPanel = new BorderPane();
-		
-		Button backBtn = new Button("Tagasi");
-		backBtn.setOnAction(e -> SceneBuilder.setNewScene(new MainScene()));
-		backBtn.setPrefSize(100, 20);
-		BorderPane header = MainScene.createHeader(backBtn);
+		BorderPane header = Main.getHeader();
 		
 		VBox centerPanel = new VBox();
 		centerPanel.setPadding(new Insets(20));
@@ -77,16 +78,15 @@ public class OrdersScene implements Scenable {
 		orderPanelInput.getChildren().add(new Label("Lisa info:"));
 		orderPanelInput.getChildren().add(additionalInfoField);
 		orderPanelInput.getChildren().add(addNewOrderButton);
-		
-		//Tööde nimekiri
-		HBox jobsPanelInput = new HBox();
-		//TODO------
-		createOrderTableView();
 
 		FlowPane tableViewsPanel = new FlowPane();
 		tableViewsPanel.getChildren().addAll(tableView);
 		
-		centerPanel.getChildren().addAll(orderPanelInput, tableView);
+		
+		removeOrderButton.setPrefSize(140, 35);
+		removeOrderButton.setOnAction(new OnButtonClicked());
+		
+		centerPanel.getChildren().addAll(orderPanelInput, tableView, removeOrderButton);
 		
 		
 		borderPanel.setTop(header);
@@ -130,7 +130,7 @@ public class OrdersScene implements Scenable {
 		List<List<String>> packMysqlData = MysqlConnector.getPackOrder();
 		for(List<String> data : packMysqlData){
 			//name(str), length(int), diameter(int), puu(char), amt_packs(int), price(int), additional_info(str)
-			orders.add(new Order(data.get(0), Integer.parseInt(data.get(1)), Integer.parseInt(data.get(2)), data.get(3), Integer.parseInt(data.get(4)),
+			orders.add(new Order(Integer.parseInt(data.get(8)), data.get(0), Integer.parseInt(data.get(1)), Integer.parseInt(data.get(2)), data.get(3), Integer.parseInt(data.get(4)),
 					Integer.parseInt(data.get(5)), data.get(6), Integer.parseInt(data.get(7))));
 		}
 		tableView.setItems(orders);
@@ -153,8 +153,15 @@ public class OrdersScene implements Scenable {
 				if(postTypes.getValue() != null && !postTypes.getValue().toString().isEmpty()){
 					MysqlConnector.insertOrder(companyName.getText(), Integer.parseInt(postTypes.getValue().toString().split("\\.")[0]),
 							Integer.parseInt(packAmount.getValue().toString()), Integer.parseInt(priceField.getText()), additionalInfoField.getText());
-					
-					//TODO Display message...
+					updateOrderList();
+				}
+			} else if(e.getSource() == removeOrderButton){
+				Order orderLine = tableView.getSelectionModel().getSelectedItem();
+				if(orderLine != null){
+					MysqlConnector.deleteOrder(orderLine.getId());
+					System.out.println(orderLine.getId());
+					updateOrderList();
+					System.out.println("DELETED.. Updated");
 				}
 			}
 		}

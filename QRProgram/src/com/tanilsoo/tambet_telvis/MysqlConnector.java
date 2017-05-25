@@ -6,8 +6,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -36,6 +43,82 @@ public class MysqlConnector {
 		}
 	}
 	
+	public static Map<String, Number> getPackOperationsByAmount(int operation, int days){
+		Map<String, Number> map = new LinkedHashMap<>();
+		String query = String.format("SELECT time, COUNT(time) FROM pack_operations WHERE operation=%d AND "
+				+ "time > DATE_SUB(NOW(), INTERVAL %d DAY) GROUP BY DAY(TIME)", operation, days);
+		try {
+			
+			LocalDate startDate = LocalDate.now().minusDays(days);
+			DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+			
+			ResultSet results = statment.executeQuery(query);
+			while(results.next()){
+				LocalDate resultDate = results.getTimestamp(1).toLocalDateTime().toLocalDate();
+				while(startDate.isBefore(resultDate)){
+					map.put(startDate.toString(), 0);
+					startDate = startDate.plusDays(1);
+				}
+				
+				map.put(resultDate.toString(), results.getInt(2));
+				
+				
+				if(startDate.isAfter(LocalDate.now())){
+					break;
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return map;
+	}
+	
+	public static Map<String, Integer> getJobData(){
+		Map<String, Integer> map = new HashMap<>();
+		String query = "SELECT job_desc, priority FROM jobs";
+		try {
+			ResultSet results = statment.executeQuery(query);
+			while(results.next()){
+				map.put(results.getString(1), results.getInt(2));
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return map;
+	}
+	
+	public static int getHighestPriority(){
+		int priority = 1;
+		String query = "SELECT MAX(priority) FROM jobs";
+		try {
+			ResultSet result = statment.executeQuery(query);
+			if(result.next()){
+				priority = result.getInt(1);
+			}
+		} catch(SQLException e){
+			e.printStackTrace();
+		}
+		return priority;
+	}
+	
+	public static void deleteOrder(int id){
+		String query = "DELETE FROM pack_order WHERE id=" + id;
+		insert(query);
+	}
+	
+	public static void deleteJob(String description, int priority){
+		String query = String.format("DELETE FROM jobs WHERE job_desc='%s' AND priority=%d", description, priority);
+		String query2 = String.format("UPDATE jobs SET priority=priority - 1 WHERE priority >= %d", priority);
+		insert(query);
+		insert(query2);
+	}
+	
+	public static void setJobPriority(String description, int priority){
+		String query = String.format("UPDATE jobs SET priority=%d WHERE job_desc='%s'", priority, description);
+		insert(query);
+	}
+	
 	public static void insertNewJob(String description, int priority){
 		String query1 = "UPDATE jobs SET priority=priority+1 WHERE priority>=" + priority;
 		String query2 = String.format("INSERT INTO jobs(job_desc, priority) VALUES('%s', %d)", description, priority);
@@ -56,7 +139,7 @@ public class MysqlConnector {
 	//name(str), length(int), diameter(int), puu(char), amt_packs(int), price(int), additional_info(str)
 	public static List<List<String>> getPackOrder(){
 		String query = "SELECT pack_order.name, post_type.length, post_type.diameter, post_type.puu, "
-				+ "pack_order.amt_packs, pack_order.price, pack_order.additional_info, pack_order.packs_done FROM pack_order, post_type "
+				+ "pack_order.amt_packs, pack_order.price, pack_order.additional_info, pack_order.packs_done, pack_order.id FROM pack_order, post_type "
 				+ "WHERE pack_order.post_type = post_type.id";
 		List<List<String>> data = new ArrayList<List<String>>();
 		try {
@@ -71,6 +154,7 @@ public class MysqlConnector {
 				row.add(String.valueOf(result.getInt(6)));
 				row.add(result.getString(7));
 				row.add(String.valueOf(result.getInt(8)));
+				row.add(String.valueOf(result.getInt(9)));
 				data.add(row);
 			}
 		} catch (SQLException e) {

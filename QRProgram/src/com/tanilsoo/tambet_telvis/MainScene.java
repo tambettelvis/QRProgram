@@ -11,6 +11,10 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -33,16 +37,9 @@ import javafx.scene.text.Font;
 
 public class MainScene implements Scenable {
 	
-	
-	Button jobsButton;
-	Button laoButton;
 	Button addPackButton;
 	Button addNewEmployeeBtn;
-	Button employeeChartButton;
 	
-	public static ObservableList<String> employeeData = FXCollections.observableArrayList();
-	public static ObservableList<String> employeeInfoData = FXCollections.observableArrayList();
-	public static ObservableList<String> lastOperationData = FXCollections.observableArrayList();
 	
 	TextField packageLength = new TextField();
 	TextField packageDiameter = new TextField();
@@ -55,9 +52,6 @@ public class MainScene implements Scenable {
 	Label lengthLabel = new Label("Paki pikkus: ");
 	Label diameterLabel = new Label("Paki diameeter: ");
 	
-	Label employeeAmtOfImmutamata;
-	Label employeeAmtOfImmutatud;
-	Label employeeAmtOfLaaditud;
 	
 	
 	static Label errorMessage = new Label();
@@ -69,23 +63,7 @@ public class MainScene implements Scenable {
 		mainPanel.setStyle("-fx-background-color: #f2e6d9;");//f9f2ec
 		
 		//Header
-		laoButton = new Button("Ladu");
-		laoButton.setPrefSize(100, 20);
-		laoButton.setOnAction(new OnButtonClicked());
-		employeeChartButton = new Button("Töötjad");
-		employeeChartButton.setPrefSize(100, 20);
-		employeeChartButton.setOnAction(new OnButtonClicked());
-		jobsButton = new Button("Tööde nimekiri");
-		jobsButton.setPrefSize(100, 20);
-		jobsButton.setOnAction(new OnButtonClicked());
-		Button changeDatabaseButton = new Button("Muuda andmeid");
-		changeDatabaseButton.setPrefSize(100, 20);
-		changeDatabaseButton.setOnAction(event -> SceneBuilder.setNewScene(new ChangeDatabaseScene()));
-		Button jobsSceneButton = new Button("Tööde nimekiri");
-		jobsSceneButton.setPrefSize(100, 20);
-		jobsSceneButton.setOnAction(event -> SceneBuilder.setNewScene(new JobsScene()));
-		BorderPane header = createHeader(laoButton, employeeChartButton, jobsButton, jobsSceneButton, changeDatabaseButton);
-		
+		BorderPane header = Main.getHeader();
 		//Add new packageType
 		VBox packAddGroup = new VBox();
 		packAddGroup.setPadding(new Insets(10));
@@ -152,49 +130,22 @@ public class MainScene implements Scenable {
 		
 		
 		//CENTER SIDE...
+		VBox centerPanel = new VBox();
+
 		
-		//Packtype informations...
+		Graph graphPanel = new Graph();
+		graphPanel.populateData(MysqlConnector.getPackOperationsByAmount(2, 30));
 		
-		FlowPane employeeInfoPanel = new FlowPane();
-		employeeInfoPanel.setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.DASHED, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
-		employeeInfoPanel.setPadding(new Insets(10));
+		centerPanel.getChildren().add(graphPanel);
 		
-		ListView<String> employeeListView = new ListView<String>(employeeData);
-		employeeListView.setPrefHeight(200);
-		ListView<String> employeeDataListView = new ListView<String>(employeeInfoData);
-		employeeDataListView.setPrefHeight(200);
-		employeeDataListView.setPrefWidth(400);
-		employeeListView.getSelectionModel().selectedItemProperty().addListener(new OnListViewItemChange());
-		
-		VBox additionalEmployeePanel = new VBox();
-		additionalEmployeePanel.setSpacing(30);
-		employeeAmtOfImmutamata = new Label("Pakke lattu tootnud(7 päeva): ");
-		employeeAmtOfImmutatud = new Label("Pakke immutatud    (7 päeva): ");
-		employeeAmtOfLaaditud = new Label("Pakke laaditud     (7 päeva): ");
-		employeeAmtOfImmutamata.setFont(new Font("Calibri", 15));
-		employeeAmtOfImmutatud.setFont(new Font("Calibri", 15));
-		employeeAmtOfLaaditud.setFont(new Font("Calibri", 15));
-		additionalEmployeePanel.getChildren().addAll(employeeAmtOfImmutamata, employeeAmtOfImmutatud, employeeAmtOfLaaditud);
-		
-		employeeInfoPanel.getChildren().addAll(employeeListView, employeeDataListView, additionalEmployeePanel);
-		
-		//Last actions info
-		FlowPane lastActionsPanel = new FlowPane();
-		ListView<String> lastActionsListView = new ListView<String>(lastOperationData);
-		lastActionsPanel.getChildren().add(lastActionsListView);
-		
-		
-		//Add components to...
-		packAddGroup.getChildren().addAll(packageTitleLabel, packLine1, packLine2, packLine3, packLine4, addPackButton);
-		employeeAddGroup.getChildren().addAll(addNewEmployeeTitleLabel, employeeLine1, addNewEmployeeBtn);
 		
 		VBox leftPanel = new VBox();
 		leftPanel.setSpacing(5);
 		leftPanel.getChildren().addAll(packAddGroup, employeeAddGroup, errorMessage);
 		
-		VBox centerPanel = new VBox();
-		centerPanel.setSpacing(10);
-		centerPanel.getChildren().addAll(employeeInfoPanel, lastActionsListView);
+		// Add components to...
+		packAddGroup.getChildren().addAll(packageTitleLabel, packLine1, packLine2, packLine3, packLine4, addPackButton);
+		employeeAddGroup.getChildren().addAll(addNewEmployeeTitleLabel, employeeLine1, addNewEmployeeBtn);
 		
 		
 		mainPanel.setLeft(leftPanel);
@@ -215,46 +166,13 @@ public class MainScene implements Scenable {
 		errorMessage.setText(message);
 	}
 	
-	public static BorderPane createHeader(Button... buttons){
-		BorderPane header = new BorderPane();
-		header.setStyle("-fx-background-color: #d9b38c;");
-		
-		HBox headerBox = new HBox();
-		headerBox.setPadding(new Insets(20));
-		headerBox.setSpacing(10);
-		headerBox.getChildren().addAll(buttons);
-		
-		HBox imgPanel = new HBox();
-		imgPanel.setPadding(new Insets(10));
-		ImageView img = new ImageView(new Image("file:woodmaster.png"));
-		img.setFitWidth(85);
-		img.setFitHeight(43);
-		imgPanel.getChildren().add(img);
-		
-		
-		header.setLeft(headerBox);
-		header.setRight(imgPanel);
-		
-		return header;
-	}
-	
-	
-	
-	
 	private class OnButtonClicked implements EventHandler<ActionEvent> {
 		
 		
 		
 		@Override
 		public void handle(ActionEvent e) {
-			if(e.getSource() == laoButton){
-				//TODO Show graphs... or something
-				SceneBuilder.setNewScene(new LaoScene());
-			} else if(e.getSource() == employeeChartButton){
-				SceneBuilder.setNewScene(new EmployeeScene());
-			} else if(e.getSource() == jobsButton) {
-				SceneBuilder.setNewScene(new OrdersScene());
-			} else if(e.getSource() == addPackButton){
+			if(e.getSource() == addPackButton){
 				if(packageLength.getText().equals("") || packageDiameter.getText().equals("") || uniqueFileField.getText().equals("")){
 					showErrorMessage("Sisesta tekst!");
 					return;
@@ -310,16 +228,6 @@ public class MainScene implements Scenable {
 		
 	}
 	
-	private class OnListViewItemChange implements ChangeListener<String> {
-		
-		@Override
-		public void changed(ObservableValue<? extends String> ov, String oldValue, String newValue) {
-			Main.updateEmployeeDataPanel(newValue);
-			employeeAmtOfImmutamata.setText("Pakke lattu tootnud(7 päeva): " + MysqlConnector.getPackImmutamatAmountByEmployee(newValue, 7));
-			employeeAmtOfImmutatud.setText("Pakke immutatud    (7 päeva): " + MysqlConnector.getPackImmutatudAmountByEmployee(newValue, 7));
-			employeeAmtOfLaaditud.setText("Pakke laaditud     (7 päeva): " + MysqlConnector.getPackLaaditudAmountByEmployee(newValue, 7));
-		}
-		
-	}
+	
 
 }

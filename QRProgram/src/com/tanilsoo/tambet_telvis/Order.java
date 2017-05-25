@@ -1,7 +1,9 @@
 package com.tanilsoo.tambet_telvis;
 
 public class Order {
-
+	
+	
+	private int id;
 	private String name;
 	private int length;
 	private int diameter;
@@ -11,8 +13,9 @@ public class Order {
 	private String additionalInfo;
 	private int packsDone;
 	
-	public Order(String name, int length, int diameter, String woodType, int amtOfPacks, int price,
+	public Order(int id, String name, int length, int diameter, String woodType, int amtOfPacks, int price,
 			String additionalInfo, int packsDone) {
+		this.id = id;
 		this.name = name;
 		this.length = length;
 		this.diameter = diameter;
@@ -85,6 +88,14 @@ public class Order {
 
 	public void setPacksDone(int packsDone) {
 		this.packsDone = packsDone;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 	
 	
