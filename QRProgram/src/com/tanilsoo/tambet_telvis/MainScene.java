@@ -2,27 +2,17 @@ package com.tanilsoo.tambet_telvis;
 
 import java.util.List;
 
-
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.chart.CategoryAxis;
-import javafx.scene.chart.LineChart;
-import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.BorderStroke;
@@ -52,9 +42,9 @@ public class MainScene implements Scenable {
 	Label lengthLabel = new Label("Paki pikkus: ");
 	Label diameterLabel = new Label("Paki diameeter: ");
 	
-	
-	
 	static Label errorMessage = new Label();
+	
+	
 
 	@Override
 	public Scene createScene() {
@@ -131,12 +121,13 @@ public class MainScene implements Scenable {
 		
 		//CENTER SIDE...
 		VBox centerPanel = new VBox();
-
 		
 		Graph graphPanel = new Graph();
 		graphPanel.populateData(MysqlConnector.getPackOperationsByAmount(2, 30));
 		
 		centerPanel.getChildren().add(graphPanel);
+		
+		//Print paneel
 		
 		
 		VBox leftPanel = new VBox();

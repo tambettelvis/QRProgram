@@ -46,7 +46,9 @@ public class LaoScene implements Scenable {
 		Map<String, Integer> tavaPacks = MysqlConnector.getLaosTavaPakke();
 		XYChart.Series series1 = new XYChart.Series();
 		for(Map.Entry<String, Integer> entry : tavaPacks.entrySet()){
-			series1.getData().add(new XYChart.Data(entry.getKey(), entry.getValue().intValue()));
+			if(entry.getValue() != 0){
+				series1.getData().add(new XYChart.Data(entry.getKey(), entry.getValue().intValue()));
+			}
 		}
         
 		
@@ -55,7 +57,9 @@ public class LaoScene implements Scenable {
 		Map<String, Integer> immutatudPacks = MysqlConnector.getLaosImmutatudPakke();
 		XYChart.Series series2 = new XYChart.Series();
 		for(Map.Entry<String, Integer> entry : immutatudPacks.entrySet()){
-			series2.getData().add(new XYChart.Data(entry.getKey(), entry.getValue().intValue()));
+			if(entry.getValue() != 0){
+				series2.getData().add(new XYChart.Data(entry.getKey(), entry.getValue().intValue()));
+			}
 		}
         
 		Scene scene = new Scene(borderPanel, Main.MAIN_WIDTH, Main.MAIN_HEIGHT);

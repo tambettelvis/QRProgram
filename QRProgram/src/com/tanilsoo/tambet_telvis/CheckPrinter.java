@@ -17,7 +17,7 @@ public class CheckPrinter extends Thread {
 		if(fileNames.size() > 0){
 			System.out.println("Printing...");
 			for(String fileName : fileNames){
-				printer.printToPrinter(fileName + ".jpg");
+				printer.printToPrinter(fileName);
 			}
 			MysqlConnector.clearPrintTable();
 		}

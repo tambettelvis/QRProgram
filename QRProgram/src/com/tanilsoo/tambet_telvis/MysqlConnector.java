@@ -43,6 +43,20 @@ public class MysqlConnector {
 		}
 	}
 	
+	public static String getFileNameById(int id){
+		String query = "SELECT unique_file FROM post_type WHERE id=" + id;
+		
+		try {
+			ResultSet result = statment.executeQuery(query);
+			if(result.next()){
+				return result.getString(1);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
 	public static Map<String, Number> getPackOperationsByAmount(int operation, int days){
 		Map<String, Number> map = new LinkedHashMap<>();
 		String query = String.format("SELECT time, COUNT(time) FROM pack_operations WHERE operation=%d AND "
@@ -368,6 +382,22 @@ public class MysqlConnector {
 			e.printStackTrace();
 		}
 		return results;
+	}
+	
+	public static List<String> getPostDataByFileName(String fileName){
+		String query = String.format("SELECT diameter, length, puu FROM post_type WHERE unique_file='%s'", fileName);
+		List<String> data = new ArrayList<String>();
+		try{
+			ResultSet rows = statment.executeQuery(query);
+			if(rows.next()){
+				data.add(String.valueOf(rows.getInt(1)));
+				data.add(String.valueOf(rows.getInt(2)));
+				data.add(rows.getString(3));
+			}
+		} catch(SQLException e){
+			e.printStackTrace();
+		}
+		return data;
 	}
 	
 	public static List<String> getPrintingFiles(){

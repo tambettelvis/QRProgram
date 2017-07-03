@@ -1,39 +1,17 @@
 package com.tanilsoo.tambet_telvis;
 
-import java.util.List;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.BorderStroke;
-import javafx.scene.layout.BorderStrokeStyle;
-import javafx.scene.layout.BorderWidths;
-import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 public class Main extends Application {
@@ -53,7 +31,7 @@ public class Main extends Application {
 		//Main frame = new Main();'
 		
 		ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(3);
-		//executor.scheduleAtFixedRate(new CheckPrinter(), 0L, 10000, TimeUnit.MILLISECONDS);
+		executor.scheduleAtFixedRate(new CheckPrinter(), 0L, 10000, TimeUnit.MILLISECONDS);
 		
 		header = createHeader();
 		launch(args);
@@ -115,6 +93,7 @@ public class Main extends Application {
 		headerBox.setSpacing(20);
 		headerBox.getChildren().addAll(
 				new HeaderButton("HOME", new MainScene()),
+				new HeaderButton("PRINDI", new PrintScene()),
 				new HeaderButton("LADU", new LaoScene()),
 				new HeaderButton("T÷÷TAJAD", new EmployeeScene()),
 				new HeaderButton("TELLIMUSED", new OrdersScene()),
