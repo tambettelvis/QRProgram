@@ -27,6 +27,9 @@ import javafx.scene.text.Font;
 
 public class MainScene implements Scenable {
 	
+	private static final int GRAPH_WIDTH = 900;
+	private static final int GRAPH_HEIGHT = 300;
+	
 	Button addPackButton;
 	Button addNewEmployeeBtn;
 	
@@ -122,10 +125,14 @@ public class MainScene implements Scenable {
 		//CENTER SIDE...
 		VBox centerPanel = new VBox();
 		
-		Graph graphPanel = new Graph();
-		graphPanel.populateData(MysqlConnector.getPackOperationsByAmount(2, 30));
+		Graph graphPanel = new Graph("Immutatud pakid(viimased 30 päeva)", GRAPH_WIDTH, GRAPH_HEIGHT);
+		graphPanel.populateData(MysqlConnector.getPackOperationsByAmount(3, 30));
 		
-		centerPanel.getChildren().add(graphPanel);
+		Graph graphPanel2 = new Graph("Immutamata pakid(viimased 30 päeva)", GRAPH_WIDTH, GRAPH_HEIGHT);
+		graphPanel2.populateData(MysqlConnector.getPackOperationsByAmount(2, 30));
+		
+		
+		centerPanel.getChildren().addAll(graphPanel, graphPanel2);
 		
 		//Print paneel
 		

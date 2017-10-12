@@ -18,6 +18,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Alert.AlertType;
+
 public class MysqlConnector {
 
 	private static final String SERVER_IP = "localhost";
@@ -39,6 +43,8 @@ public class MysqlConnector {
 		} catch(ClassNotFoundException e){
 			e.printStackTrace();
 		} catch (SQLException e) {
+			Alert alert = new Alert(AlertType.ERROR, "Ei saanud MySQL serveriga ühendust!", ButtonType.OK);
+			alert.show();
 			e.printStackTrace();
 		}
 	}
@@ -62,9 +68,7 @@ public class MysqlConnector {
 		String query = String.format("SELECT time, COUNT(time) FROM pack_operations WHERE operation=%d AND "
 				+ "time > DATE_SUB(NOW(), INTERVAL %d DAY) GROUP BY DAY(TIME)", operation, days);
 		try {
-			
 			LocalDate startDate = LocalDate.now().minusDays(days);
-			DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
 			
 			ResultSet results = statment.executeQuery(query);
 			while(results.next()){
@@ -73,11 +77,10 @@ public class MysqlConnector {
 					map.put(startDate.toString(), 0);
 					startDate = startDate.plusDays(1);
 				}
-				
 				map.put(resultDate.toString(), results.getInt(2));
+				startDate = startDate.plusDays(1);
 				
-				
-				if(startDate.isAfter(LocalDate.now())){
+				if(startDate.isAfter(LocalDate.now().plusDays(1))){
 					break;
 				}
 			}

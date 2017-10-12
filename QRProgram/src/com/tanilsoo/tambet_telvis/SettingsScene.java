@@ -1,12 +1,13 @@
 package com.tanilsoo.tambet_telvis;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CreationHelper;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -24,6 +25,8 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 
 public class SettingsScene implements Scenable {
 
@@ -62,8 +65,10 @@ public class SettingsScene implements Scenable {
 				new Label("Pakkide arv: "), amountOfPacks, new Label(" | Muuda: "),
 				amountComboBox, saveButton);
 		
+		HBox exportPanel = new HBox(10);
 		exportButton.setOnAction(event -> exportExcel());
-		rows.getChildren().addAll(packPanel, exportButton);
+		exportPanel.getChildren().addAll(new Label("Ekspordi pakkide arv: "), exportButton);
+		rows.getChildren().addAll(packPanel, exportPanel);
 		
 		mainPanel.setTop(header);
 		mainPanel.setCenter(rows);
@@ -76,23 +81,65 @@ public class SettingsScene implements Scenable {
 	    CreationHelper createHelper = wb.getCreationHelper();
 	    Sheet sheet = wb.createSheet("new sheet");
 	    
+	    Map<String, Integer> immutamata = MysqlConnector.getPakke("laos_tavalisi_pakke");
+	    Map<String, Integer> immutatud = MysqlConnector.getPakke("laos_immutatud_pakke");
+	    
 	    Row row = sheet.createRow((short)0);
-	    Cell cell = row.createCell(0);
-	    cell.setCellValue(1);
-	    row.createCell(2).setCellValue(
-	            createHelper.createRichTextString("This is a string"));
-	    try {
-			FileOutputStream stream = new FileOutputStream("java.xls");
-			wb.write(stream);
-			stream.close();
-			wb.close();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	    row.createCell(0).setCellValue(
+	            createHelper.createRichTextString("Immutamata pakid"));
+	    Row titles = sheet.createRow(2);
+	    titles.createCell(0).setCellValue(createHelper.createRichTextString("Post Type"));
+	    titles.createCell(1).setCellValue(createHelper.createRichTextString("Amount"));
+	    
+	    int startRow = 3;
+	    
+	    Iterator<Map.Entry<String, Integer>> it = immutamata.entrySet().iterator();
+	    while (it.hasNext()) {
+	    	Map.Entry<String, Integer> entry = it.next();
+	    	Row r = sheet.createRow(startRow);
+	    	r.createCell(0).setCellValue(createHelper.createRichTextString(entry.getKey()));
+		    r.createCell(1).setCellValue(entry.getValue());
+		    startRow += 1;
+	    }
+	    
+	    
+	    Row row2 = sheet.createRow(startRow);
+	    row2.createCell(0).setCellValue(createHelper.createRichTextString("Immutatud pakid"));
+	    startRow++;
+	    Row titles2 = sheet.createRow(startRow);
+	    titles2.createCell(0).setCellValue(createHelper.createRichTextString("Post Type"));
+	    titles2.createCell(1).setCellValue(createHelper.createRichTextString("Amount"));
+	    startRow++;
+	    
+	    Iterator<Map.Entry<String, Integer>> it2 = immutatud.entrySet().iterator();
+	    while (it2.hasNext()) {
+	    	Map.Entry<String, Integer> entry = it2.next();
+	    	Row r = sheet.createRow(startRow);
+	    	r.createCell(0).setCellValue(createHelper.createRichTextString(entry.getKey()));
+		    r.createCell(1).setCellValue(entry.getValue());
+		    startRow += 1;
+	    }
+	    
+	    FileChooser fileChooser = new FileChooser();
+	    fileChooser.setTitle("Salvesta fail");
+	    FileChooser.ExtensionFilter fileExtensions = new FileChooser.ExtensionFilter("Excel failid", "*.xls", "*.xlsx", "*.xlt");
+	    fileChooser.getExtensionFilters().add(fileExtensions);
+	    
+	    File file = fileChooser.showSaveDialog(Main.primaryStage);
+	    if(file!= null){
+		    try {
+				FileOutputStream stream = new FileOutputStream(file);
+				wb.write(stream);
+				stream.close();
+				wb.close();
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	    }
 	}
 	
 	private class OnButtonClicked implements EventHandler<ActionEvent> {

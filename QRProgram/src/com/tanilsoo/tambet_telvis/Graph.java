@@ -15,11 +15,12 @@ public class Graph extends FlowPane {
 	LineChart<String, Number> chart;
 	XYChart.Series<String, Number> series;
 	
-	public  Graph(){
+	public  Graph(String seriesName, int preferedWidth, int preferedHeight){
 		chart = new LineChart<>(axisX, axisY);
-		chart.setPrefWidth(900);
+		chart.setPrefWidth(preferedWidth);
+		chart.setPrefHeight(preferedHeight);
 		series = new XYChart.Series<>();
-		series.setName("Immutatud pakid(viimased 30 päeva)");
+		series.setName(seriesName);
 		getChildren().add(chart);
 	}
 	

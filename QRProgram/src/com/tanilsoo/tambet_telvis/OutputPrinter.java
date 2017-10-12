@@ -20,6 +20,10 @@ import java.io.StringReader;
 
 import javax.imageio.ImageIO;
 
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Alert.AlertType;
+
 public class OutputPrinter implements Printable {
 
 	private static final int QR_MARGIN_X = -20;
@@ -27,7 +31,7 @@ public class OutputPrinter implements Printable {
 	private static final int LABEL_MARGIN_X = 30;
 	private static final int LABEL_MARGIN_Y = 30;
 	private static final String FILE_TYPE = ".jpeg";
-	private static final String PATH = "images/";
+	private static final String PATH = "C://woodmasters/images/";
 	
 	String imageFileName;
 	String label;
@@ -54,6 +58,8 @@ public class OutputPrinter implements Printable {
 			bi = ImageIO.read(new File(PATH + imageFileName  + FILE_TYPE));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
+			Alert alert = new Alert(AlertType.ERROR, "Image not found at " + PATH + imageFileName  + FILE_TYPE, ButtonType.OK);
+			alert.show();
 			e.printStackTrace();
 			System.out.println("----IMG NOT FOUND");
 		}		

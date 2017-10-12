@@ -6,6 +6,10 @@ import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.util.List;
 
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Alert.AlertType;
+
 public class ConnectPrinter {
 	
 	public void printToPrinter(String imageFileName){
@@ -48,6 +52,8 @@ public class ConnectPrinter {
 	        }
 	        catch (PrinterException e)
 	        {
+	        	Alert alert = new Alert(AlertType.ERROR, "Printing error: " + e.getMessage(), ButtonType.OK);
+				alert.show();
 	        	System.out.println("PRINTING ERROR");
 	        	e.printStackTrace();
 	            // Print job did not complete.

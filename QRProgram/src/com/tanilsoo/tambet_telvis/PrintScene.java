@@ -71,7 +71,7 @@ public class PrintScene implements Scenable {
 			ConnectPrinter printer = new ConnectPrinter();
 			int packId = Integer.parseInt(item.split("\\.")[0]);
 			System.out.println(packId);
-			//printer.printToPrinter(MysqlConnector.getFileNameById(packId), defaultPrinterCheckBox.isSelected(), amountComboBox.getValue());
+			printer.printToPrinter(MysqlConnector.getFileNameById(packId), defaultPrinterCheckBox.isSelected(), amountComboBox.getValue());
 			System.out.println("PRINTING...");
 		} else {
 		}
