@@ -31,7 +31,7 @@ public class Main extends Application {
 		//Main frame = new Main();'
 		
 		ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(3);
-		executor.scheduleAtFixedRate(new CheckPrinter(), 0L, 10000, TimeUnit.MILLISECONDS);
+		executor.scheduleAtFixedRate(new CheckPrinter(), 0L, 15000, TimeUnit.MILLISECONDS);
 		
 		header = createHeader();
 		launch(args);
@@ -94,6 +94,7 @@ public class Main extends Application {
 		headerBox.getChildren().addAll(
 				new HeaderButton("HOME", new MainScene()),
 				new HeaderButton("PRINDI", new PrintScene()),
+				new HeaderButton("LISA/EEMALDA", new AddRemovePacksScene()),
 				new HeaderButton("LADU", new LaoScene()),
 				new HeaderButton("T÷÷TAJAD", new EmployeeScene()),
 				new HeaderButton("TELLIMUSED", new OrdersScene()),

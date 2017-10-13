@@ -433,8 +433,34 @@ public class MysqlConnector {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
+	}
+	
+	public static void addPackInToLaosImmutatud(int id, int amt){
+		insert("INSERT INTO laos_immutatud_pakke(id,paki_id,amount) VALUES(NULL," + id + "," + amt + ")");
+	}
+	
+	public static void incrementLaosImmutatudPack(int id, int amt){
+		insert("UPDATE laos_immutatud_pakke SET amount=amount+" + amt + " WHERE paki_id=" + id);
+	}
+	
+	public static void decrementLaosImmutatudPack(int id, int amt){
+		insert("UPDATE laos_immutatud_pakke SET amount=amount-" + amt + " WHERE paki_id=" + id);
+	}
+	
+	public static boolean isPackInImmutatud(int id){
+		String query = "SELECT id FROM laos_immutatud_pakke WHERE paki_id=" + id;
+		ResultSet rows = null;
+		try {
+			rows = statment.executeQuery(query);
+			if(rows.next()){
+				System.out.println("returned true");
+				return true;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		System.out.println("returned false");
+		return false;
 	}
 	
 	public static boolean isConnected(){
