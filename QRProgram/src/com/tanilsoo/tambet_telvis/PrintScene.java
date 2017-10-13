@@ -9,6 +9,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -26,8 +27,27 @@ public class PrintScene implements Scenable {
 	CheckBox defaultPrinterCheckBox;
 	
 	public PrintScene(){
+		try {
 		postTypes.addAll(OrdersScene.getPostTypeItems());
+		} catch(Exception e){
+			System.out.println("exception captured");
+		}
 		postTypesListView.setItems(postTypes);
+		postTypesListView.setCellFactory(cell -> {
+            return new ListCell<String>() {
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (item != null) {
+                    	String[] split1 = item.split("\\.");
+                    	String[] split2 = split1[1].split("/");
+                        setText(split1[0] + ". " + "\t \t" + split2[1] + " / " + split2[0] + " / " + split2[2]);
+
+                        setFont(Font.font(20));
+                    }
+                }
+            };
+        });
 		amountComboBox = new ComboBox<Integer>(OrdersScene.getComboBoxItems(10));
 		amountComboBox.getSelectionModel().selectFirst();
 	}

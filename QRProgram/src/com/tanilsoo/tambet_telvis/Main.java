@@ -28,7 +28,6 @@ public class Main extends Application {
 	
 	public static void main(String[] args){
 		mysqlConnector = new MysqlConnector();
-		//Main frame = new Main();'
 		
 		ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(3);
 		executor.scheduleAtFixedRate(new CheckPrinter(), 0L, 15000, TimeUnit.MILLISECONDS);
@@ -51,16 +50,10 @@ public class Main extends Application {
 		primaryStage.setTitle("Title");
 		
 		
-		
-		
-		//LaoScene laoScene = new LaoScene(scene2);
-		
-		SceneBuilder.setNewScene(new MainScene());
+		//SceneBuilder.setNewScene(new MainScene());
+		SceneBuilder.setNewScene(new PrintScene());
 		Main.primaryStage.setOnCloseRequest(e -> closeApplication());
 		Main.primaryStage.show();
-		
-		initialize();
-		
 	}
 	
 	private void closeApplication() {
@@ -68,13 +61,6 @@ public class Main extends Application {
 		System.exit(0);
 	}
 
-
-	public static void initialize(){
-		
-	}
-	
-	
-	
 	public Scene getMainScene(){
 		return mainScene;
 	}
@@ -91,7 +77,7 @@ public class Main extends Application {
 		HBox headerBox = new HBox();
 		headerBox.setPadding(new Insets(20));
 		headerBox.setSpacing(20);
-		headerBox.getChildren().addAll(
+		/*headerBox.getChildren().addAll(
 				new HeaderButton("HOME", new MainScene()),
 				new HeaderButton("PRINDI", new PrintScene()),
 				new HeaderButton("LISA/EEMALDA", new AddRemovePacksScene()),
@@ -101,7 +87,13 @@ public class Main extends Application {
 				new HeaderButton("T÷÷DE NIMEKIRI", new JobsScene()),
 				new HeaderButton("SEADED", new SettingsScene()),
 				new HeaderButton("RAW DATA", new RawDataScene())
+				);*/
+		
+		
+		 headerBox.getChildren().addAll(
+				new HeaderButton("PRINDI", new PrintScene())
 				);
+		 
 		
 		HBox imgPanel = new HBox();
 		imgPanel.setPadding(new Insets(10));

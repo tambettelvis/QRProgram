@@ -219,7 +219,6 @@ public class MainScene implements Scenable {
 				showSucessMessage("Töötaja lisatud!");
 			} 
 			
-			Main.initialize();
 		}
 
 	

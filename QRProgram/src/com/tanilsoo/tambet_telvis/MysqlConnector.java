@@ -43,8 +43,6 @@ public class MysqlConnector {
 		} catch(ClassNotFoundException e){
 			e.printStackTrace();
 		} catch (SQLException e) {
-			Alert alert = new Alert(AlertType.ERROR, "Ei saanud MySQL serveriga ühendust!", ButtonType.OK);
-			alert.show();
 			e.printStackTrace();
 		}
 	}
