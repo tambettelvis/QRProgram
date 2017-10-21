@@ -26,8 +26,8 @@ public class ConnectPrinter {
 	    }
 	    
 	    if(doPrint){
-	    	List<String> postData = MysqlConnector.getPostDataByFileName(imageFileName);
-	    	String label = postData.get(0) + " / " + postData.get(1) + " / " + postData.get(2);
+	    	Pack pack = PackManager.getPackByUniqueFile(imageFileName);
+	    	String label = pack.getDiameter() + " / " + pack.getLength() + " / " + pack.getPuu();
 		    PageFormat pf = job.defaultPage();
 		    
 		    
@@ -44,7 +44,7 @@ public class ConnectPrinter {
 		    paper.setImageableArea(0, 0, width, height);
 		    pf.setPaper(paper);
 		    
-		    job.setPrintable(new OutputPrinter(imageFileName, label), pf);
+		    job.setPrintable(new OutputPrinter(imageFileName, label, pack.getAdditionInformation()), pf);
 		    job.setCopies(amount);
 	        try 
 	        {

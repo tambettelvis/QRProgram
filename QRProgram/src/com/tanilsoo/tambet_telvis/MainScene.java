@@ -6,13 +6,16 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.BorderStroke;
@@ -28,7 +31,7 @@ import javafx.scene.text.Font;
 public class MainScene implements Scenable {
 	
 	private static final int GRAPH_WIDTH = 900;
-	private static final int GRAPH_HEIGHT = 300;
+	private static final int GRAPH_HEIGHT = 600;
 	
 	Button addPackButton;
 	Button addNewEmployeeBtn;
@@ -37,16 +40,10 @@ public class MainScene implements Scenable {
 	TextField packageLength = new TextField();
 	TextField packageDiameter = new TextField();
 	TextField employeeNameField = new TextField();
-	TextField uniqueFileField = new TextField();
-	
-	ToggleGroup radioGroup;
-	String selectedRadioButton = "Mänd";
+	TextField additionalInfo = new TextField();
 	
 	Label lengthLabel = new Label("Paki pikkus: ");
 	Label diameterLabel = new Label("Paki diameeter: ");
-	
-	static Label errorMessage = new Label();
-	
 	
 
 	@Override
@@ -69,10 +66,8 @@ public class MainScene implements Scenable {
 		FlowPane packLine1 = new FlowPane();
 		FlowPane packLine2 = new FlowPane();
 		FlowPane packLine3 = new FlowPane();
-		FlowPane packLine4 = new FlowPane();
 		
 		Label packageTitleLabel = new Label("Lisa uus paki tüüp:");
-		Label uniqueFileLabel = new Label("Faili nimi:");
 		packageTitleLabel.setFont(new Font("Calibri", 18));//TODO add font family.
 		
 		addPackButton = new Button("Lisa");
@@ -81,23 +76,11 @@ public class MainScene implements Scenable {
 		
 		packageLength.setMaxWidth(50);
 		packageDiameter.setMaxWidth(50);
-		uniqueFileField.setMaxWidth(50);
-		
-		radioGroup = new ToggleGroup();
-		RadioButton mRadioBtn = new RadioButton("Mänd");
-		RadioButton kRadioBtn = new RadioButton("Kuusk");
-		mRadioBtn.setUserData("M");
-		kRadioBtn.setUserData("K");
-		mRadioBtn.setSelected(true);
-		mRadioBtn.setToggleGroup(radioGroup);
-		kRadioBtn.setToggleGroup(radioGroup);
-		Label woodTypeLabel = new Label("Puu liik ");
+		additionalInfo.setMaxWidth(50);
 		
 		packLine1.getChildren().addAll(lengthLabel, packageLength);
 		packLine2.getChildren().addAll(diameterLabel, packageDiameter);
-		packLine3.getChildren().addAll(woodTypeLabel, mRadioBtn, kRadioBtn);
-		packLine4.getChildren().addAll(uniqueFileLabel, uniqueFileField);
-		
+		packLine3.getChildren().addAll(new Label("Lisa info"), additionalInfo);
 		
 		
 		//Employee...
@@ -128,21 +111,19 @@ public class MainScene implements Scenable {
 		Graph graphPanel = new Graph("Immutatud pakid(viimased 30 päeva)", GRAPH_WIDTH, GRAPH_HEIGHT);
 		graphPanel.populateData(MysqlConnector.getPackOperationsByAmount(3, 30));
 		
-		Graph graphPanel2 = new Graph("Immutamata pakid(viimased 30 päeva)", GRAPH_WIDTH, GRAPH_HEIGHT);
-		graphPanel2.populateData(MysqlConnector.getPackOperationsByAmount(2, 30));
 		
 		
-		centerPanel.getChildren().addAll(graphPanel, graphPanel2);
+		centerPanel.getChildren().addAll(graphPanel);
 		
 		//Print paneel
 		
 		
 		VBox leftPanel = new VBox();
 		leftPanel.setSpacing(5);
-		leftPanel.getChildren().addAll(packAddGroup, employeeAddGroup, errorMessage);
+		leftPanel.getChildren().addAll(packAddGroup, employeeAddGroup);
 		
 		// Add components to...
-		packAddGroup.getChildren().addAll(packageTitleLabel, packLine1, packLine2, packLine3, packLine4, addPackButton);
+		packAddGroup.getChildren().addAll(packageTitleLabel, packLine1, packLine2, packLine3, addPackButton);
 		employeeAddGroup.getChildren().addAll(addNewEmployeeTitleLabel, employeeLine1, addNewEmployeeBtn);
 		
 		
@@ -154,43 +135,62 @@ public class MainScene implements Scenable {
 		return scene;
 	}
 	
-	public static void showErrorMessage(String message){
-		errorMessage.setTextFill(Color.RED);
-		errorMessage.setText(message);
+	public void displayErrorMessage(String message){
+		Alert alert = new Alert(AlertType.ERROR, message, ButtonType.OK);
+		alert.show();
 	}
 	
-	public static void showSucessMessage(String message){
-		errorMessage.setTextFill(Color.GREEN);
-		errorMessage.setText(message);
+	public void displayConfirmationMessage(String message){
+		Alert alert = new Alert(AlertType.CONFIRMATION, message, ButtonType.OK);
+		alert.show();
 	}
+	
 	
 	private class OnButtonClicked implements EventHandler<ActionEvent> {
 		
+		
+		public String generateUniqueFile(){
+			String lastUniqueFile = PackManager.packs.get(PackManager.packs.size()-1).getUniqueFile();
+			int newUniqueFile = Integer.parseInt(lastUniqueFile.substring(2)) + 1;
+			for(Pack p : PackManager.packs){
+				System.out.println(p.getUniqueFile());
+			}
+			for(int i = 0; i < PackManager.packs.size(); i++){
+				if(PackManager.packs.get(i).getUniqueFile().equals("qr" + newUniqueFile)){
+					System.out.println(newUniqueFile);
+					newUniqueFile++;
+					i = -1;
+				}
+			}
+			System.out.println("Final QR " + newUniqueFile);
+			return "qr" + newUniqueFile;
+		}
 		
 		
 		@Override
 		public void handle(ActionEvent e) {
 			if(e.getSource() == addPackButton){
-				if(packageLength.getText().equals("") || packageDiameter.getText().equals("") || uniqueFileField.getText().equals("")){
-					showErrorMessage("Sisesta tekst!");
+				if(packageLength.getText().equals("") || packageDiameter.getText().equals("")){
+					displayErrorMessage("Kontrolli väljasid.");
 					return;
-				}
-				
-				//Cheking that unique file doesn't exist...
-				List<String> uniqueFiles = MysqlConnector.getUniqueFiles();
-				for(String fileName : uniqueFiles){
-					if(fileName.equals(uniqueFileField.getText())){
-						showErrorMessage("Fail ei ole unikaalne!");
-						//Display error
-						return;
-					}
 				}
 				
 				int packLengthInt = Integer.parseInt(packageLength.getText());
 				int packDiameterInt = Integer.parseInt(packageDiameter.getText());
 				
-				MysqlConnector.insertPactType(packLengthInt, packDiameterInt, radioGroup.getSelectedToggle().getUserData().toString(), uniqueFileField.getText());
-				showSucessMessage("Pakk lisatud!");
+				PackManager.refreshPacksList();
+				
+				if(additionalInfo.getText().trim().equals("") || additionalInfo.getText() == null){
+					MysqlConnector.insertPactType(packLengthInt, packDiameterInt, "M", generateUniqueFile(), null);
+					MysqlConnector.insertPactType(packLengthInt, packDiameterInt, "K", generateUniqueFile(), null);
+					
+				} else {
+					MysqlConnector.insertPactType(packLengthInt, packDiameterInt, "M", generateUniqueFile(), additionalInfo.getText().trim());
+					MysqlConnector.insertPactType(packLengthInt, packDiameterInt, "K", generateUniqueFile(), additionalInfo.getText().trim());
+				}
+				
+				
+				displayConfirmationMessage("Pakk lisatud!");
 				//System.out.println("Button");
 				//updatePackagePanel();
 				/*
@@ -202,21 +202,21 @@ public class MainScene implements Scenable {
 			} else if(e.getSource() == addNewEmployeeBtn){
 				
 				if(employeeNameField.getText().trim().equals("")){
-					showErrorMessage("Sisesta tekst...");
+					displayErrorMessage("Sisesta tekst...");
 					return;
 				}
 				
 				List<String> employeeNames = MysqlConnector.getEmployeeNames();
 				for(String name : employeeNames){
 					if(name.equals(employeeNameField.getText())){
-						showErrorMessage("Töötaja on juba lisatud!");
+						displayErrorMessage("Töötaja on juba lisatud!");
 						//Display error;
 						return;
 					}
 				}
 				
 				MysqlConnector.insertEmployee(employeeNameField.getText());
-				showSucessMessage("Töötaja lisatud!");
+				displayConfirmationMessage("Töötaja lisatud!");
 			} 
 			
 		}

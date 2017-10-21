@@ -29,16 +29,16 @@ public class OrdersScene implements Scenable {
 	TextField companyName = new TextField();
 	TextField priceField = new TextField();
 	TextField additionalInfoField = new TextField();
-	ComboBox packAmount;
-	ComboBox postTypes;
+	ComboBox<Integer> packAmount;
+	ComboBox<Pack> postTypes;
 	
 	TableView<Order> tableView = new TableView<Order>();
 	Button addNewOrderButton = new Button("Lisa");
 	Button removeOrderButton = new Button("Eemalda");
 	
 	public OrdersScene() {
-		packAmount = new ComboBox(getComboBoxItems(100));
-		postTypes = new ComboBox(getPostTypeItems());
+		packAmount = new ComboBox<>(getComboBoxItems(100));
+		postTypes = PackManager.getPostTypesComboBox(); // TODO add postypes.
 		createOrderTableView();
 	}
 	
@@ -116,14 +116,6 @@ public class OrdersScene implements Scenable {
 		packsDoneColumn.setCellValueFactory(new PropertyValueFactory<Order, String>("packsDone"));
 	}
 	
-	public static ObservableList<String> getPostTypeItems(){
-		ObservableList<String> items = FXCollections.observableArrayList();
-		List<String> mysqlData = MysqlConnector.getPostTypes();
-		for(String data : mysqlData){
-			items.add(data);
-		}
-		return items;
-	}
 
 	public void updateOrderList(){
 		orders.clear();

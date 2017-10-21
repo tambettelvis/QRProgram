@@ -24,16 +24,20 @@ import javafx.scene.control.Alert.AlertType;
 
 public class MysqlConnector {
 
-	private static final String SERVER_IP = "localhost";
-	private static final String USER = "root";
-	private static final String PASSWORD = "";
+	private static final String SERVER_IP = "90.190.115.141";
+	private static final String USER = "client";
+	private static final String PASSWORD = "banaan2";
 	private static final String DATABASE = "qrinfo";
 	
 	private static boolean connected = false;
 	private static Connection conn = null;
 	private static Statement statment = null;
 	
-	public MysqlConnector(){
+	public MysqlConnector() {
+		connectDatabase();
+	}
+	
+	public static void connectDatabase(){
 		try{
 			Class.forName("com.mysql.jdbc.Driver");
 			
@@ -227,10 +231,17 @@ public class MysqlConnector {
 		return data;
 	}
 	
-	public static void insertPactType(int length, int diameter, String puu, String uniqueFile){
-		String query = String.format("INSERT INTO post_type(id, length, diameter, puu, unique_file) VALUES(NULL, %d, %d, '%s', '%s')",
-				length, diameter, puu, uniqueFile);
+	public static void insertPactType(int length, int diameter, String puu, String uniqueFile, String additionalInfo){
+		String query;
+		if(additionalInfo != null){
+			query = String.format("INSERT INTO post_type(id, length, diameter, puu, unique_file, additional_info) VALUES(NULL, %d, %d, '%s', '%s', '%s')",
+					length, diameter, puu, uniqueFile, additionalInfo);
+		} else {
+			query = String.format("INSERT INTO post_type(id, length, diameter, puu, unique_file, additional_info) VALUES(NULL, %d, %d, '%s', '%s', NULL)",
+					length, diameter, puu, uniqueFile);
+		}
 		insert(query);
+		PackManager.refreshPacksList();
 	}
 	
 	public static List<String> getEmployeeNames(){
@@ -330,54 +341,43 @@ public class MysqlConnector {
 		return null;// Handle error...
 	}
 	
-	public static Map<String, Integer> getLaosTavaPakke(){
-		return getPakke("laos_tavalisi_pakke");
-	}
 	
-	public static Map<String, Integer> getLaosImmutatudPakke(){
-		return getPakke("laos_immutatud_pakke");
-	}
-	
-	public static Map<String, Integer> getPakke(String table){
-		Map<String, Integer> result = new HashMap();
+	public static Map<Integer, Integer> getLaosImmutatudPakke(){ 
+		//ID, AMOUNT
+		Map<Integer, Integer> result = new HashMap<>();
 		
 		try{
-			String query = "SELECT paki_id, amount FROM " + table;
-			Map<Integer, Integer> dataImmutatud = new HashMap();
+			String query = "SELECT paki_id, amount FROM laos_immutatud_pakke";
 			ResultSet rows = statment.executeQuery(query);
 			while(rows.next()){
-				dataImmutatud.put(rows.getInt(1), rows.getInt(2));
+				result.put(rows.getInt(1), rows.getInt(2));
 			}
 			
-			query = "SELECT id, length, diameter, puu FROM post_type";
-			rows = statment.executeQuery(query);
-			while(rows.next()){
-				String s = rows.getInt(2) + "/" + rows.getInt(3) + "/" + rows.getString(4);
-				
-				Integer amount = dataImmutatud.get(rows.getInt(1));
-				
-				if(amount == null){
-					result.put(s, 0);
-				} else {
-					result.put(s, amount);
-				}
-			}
-			
-		
 		} catch(SQLException e){
 			e.printStackTrace();
 		}
 		return result;
 	}
 	
-	public static List<String> getPostTypes(){
-		String query = "SELECT id, length, diameter, puu FROM post_type";
-		List<String> results = new ArrayList<>();
+	public static List<Pack> getPostTypes(){
+		String query = "SELECT id, length, diameter, puu, unique_file, additional_info FROM post_type ORDER BY diameter, length";
+		List<Pack> results = new ArrayList<>();
 		ResultSet rows = null;
 		try {
 			rows = statment.executeQuery(query);
 			while(rows.next()){
-				results.add(rows.getString(1) + ". " + rows.getString(2) + "/" + rows.getString(3) + "/" + rows.getString(4));
+				int id = rows.getInt(1);
+				int length = rows.getInt(2);
+				int diameter = rows.getInt(3);
+				String puu = rows.getString(4);
+				String uniqueFile = rows.getString(5);
+				String additionalInfo = rows.getString(6);
+				
+				if(additionalInfo != null){
+					results.add(new Pack(id, length, diameter, uniqueFile, puu, additionalInfo));
+				} else {
+					results.add(new Pack(id, length, diameter, uniqueFile, puu));
+				}
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -386,7 +386,7 @@ public class MysqlConnector {
 	}
 	
 	public static List<String> getPostDataByFileName(String fileName){
-		String query = String.format("SELECT diameter, length, puu FROM post_type WHERE unique_file='%s'", fileName);
+		String query = String.format("SELECT diameter, length, puu, additional_info FROM post_type WHERE unique_file='%s'", fileName);
 		List<String> data = new ArrayList<String>();
 		try{
 			ResultSet rows = statment.executeQuery(query);
@@ -394,6 +394,7 @@ public class MysqlConnector {
 				data.add(String.valueOf(rows.getInt(1)));
 				data.add(String.valueOf(rows.getInt(2)));
 				data.add(rows.getString(3));
+				data.add(rows.getString(4));
 			}
 		} catch(SQLException e){
 			e.printStackTrace();

@@ -19,33 +19,45 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 
 public class SettingsScene implements Scenable {
 
-	ComboBox<String> postTypes;
+
+	ComboBox<Integer> packAmount;
+	ComboBox<Pack> postTypes1;
+	Button lisaButton = new Button("Lisa");
+	Button eemaldaButton = new Button("Eemalda");
+	
+	ComboBox<Pack> postTypes2;
 	ComboBox<Integer> amountComboBox;
 	Label amountOfPacks = new Label("NO VALUE");
 	
-	Map<String, Integer> tavaPacks;
-	Map<String, Integer> immutatudPacks;
+	Map<Integer, Integer> immutatudPacks;
 	
+	Button saveButton = new Button("Salvesta");
 	Button exportButton = new Button("EXPORT EXCEL");
 	
 	public SettingsScene() {
-		postTypes = new ComboBox<String>(OrdersScene.getPostTypeItems());
-		postTypes.valueProperty().addListener(new OnComboBoxValueChange());
+		packAmount = new ComboBox<>(OrdersScene.getComboBoxItems(100));
+		postTypes1 = PackManager.getPostTypesComboBox();
+		
+		postTypes2 = PackManager.getPostTypesComboBox();
+		postTypes2.valueProperty().addListener(new OnComboBoxValueChange());
 		amountComboBox = new ComboBox<Integer>(OrdersScene.getComboBoxItems(100));
 		
-		
-		tavaPacks = MysqlConnector.getLaosTavaPakke();
 		immutatudPacks = MysqlConnector.getLaosImmutatudPakke();
 	}
 	
@@ -54,21 +66,31 @@ public class SettingsScene implements Scenable {
 		BorderPane mainPanel = new BorderPane();
 		BorderPane header = Main.getHeader();
 		
-		Button saveButton = new Button("Salvesta");
-		saveButton.setOnAction(new OnButtonClicked(11));
+		Label l = new Label("Pakkide haldus");
+		l.setFont(new Font("Calibri", 18));
+		lisaButton.setOnAction(new OnButtonClicked());
+		eemaldaButton.setOnAction(new OnButtonClicked());
+		HBox lisaPackPanel = new HBox(10);
+		lisaPackPanel.getChildren().addAll(new Label("Lisa/eemalda pakke: "), postTypes1, packAmount, lisaButton, eemaldaButton);
+		
+		VBox addPackPanel = new VBox(10);
+		addPackPanel.getChildren().addAll(l, lisaPackPanel);
+		
+		
+		saveButton.setOnAction(new OnButtonClicked());
 		
 		VBox rows = new VBox(10);
 		rows.setPadding(new Insets(20));
 		
 		HBox packPanel = new HBox(10);
-		packPanel.getChildren().addAll(new Label("Tavalisi: "), postTypes,
+		packPanel.getChildren().addAll(new Label("Immutatud: "), postTypes2,
 				new Label("Pakkide arv: "), amountOfPacks, new Label(" | Muuda: "),
 				amountComboBox, saveButton);
 		
 		HBox exportPanel = new HBox(10);
 		exportButton.setOnAction(event -> exportExcel());
 		exportPanel.getChildren().addAll(new Label("Ekspordi pakkide arv: "), exportButton);
-		rows.getChildren().addAll(packPanel, exportPanel);
+		rows.getChildren().addAll(addPackPanel, packPanel, exportPanel);
 		
 		mainPanel.setTop(header);
 		mainPanel.setCenter(rows);
@@ -81,44 +103,27 @@ public class SettingsScene implements Scenable {
 	    CreationHelper createHelper = wb.getCreationHelper();
 	    Sheet sheet = wb.createSheet("new sheet");
 	    
-	    Map<String, Integer> immutamata = MysqlConnector.getPakke("laos_tavalisi_pakke");
-	    Map<String, Integer> immutatud = MysqlConnector.getPakke("laos_immutatud_pakke");
+	    Map<Integer, Integer> immutatud = MysqlConnector.getLaosImmutatudPakke();
 	    
-	    Row row = sheet.createRow((short)0);
-	    row.createCell(0).setCellValue(
-	            createHelper.createRichTextString("Immutamata pakid"));
-	    Row titles = sheet.createRow(2);
-	    titles.createCell(0).setCellValue(createHelper.createRichTextString("Post Type"));
-	    titles.createCell(1).setCellValue(createHelper.createRichTextString("Amount"));
-	    
+
 	    int startRow = 3;
 	    
-	    Iterator<Map.Entry<String, Integer>> it = immutamata.entrySet().iterator();
-	    while (it.hasNext()) {
-	    	Map.Entry<String, Integer> entry = it.next();
-	    	Row r = sheet.createRow(startRow);
-	    	r.createCell(0).setCellValue(createHelper.createRichTextString(entry.getKey()));
-		    r.createCell(1).setCellValue(entry.getValue());
-		    startRow += 1;
-	    }
-	    
-	    
-	    Row row2 = sheet.createRow(startRow);
-	    row2.createCell(0).setCellValue(createHelper.createRichTextString("Immutatud pakid"));
+	    Row row = sheet.createRow(startRow);
+	    row.createCell(0).setCellValue(createHelper.createRichTextString("Immutatud pakid"));
 	    startRow++;
-	    Row titles2 = sheet.createRow(startRow);
-	    titles2.createCell(0).setCellValue(createHelper.createRichTextString("Post Type"));
-	    titles2.createCell(1).setCellValue(createHelper.createRichTextString("Amount"));
+	    Row titles = sheet.createRow(startRow);
+	    titles.createCell(0).setCellValue(createHelper.createRichTextString("Post Type"));
+	    titles.createCell(1).setCellValue(createHelper.createRichTextString("Amount"));
 	    startRow++;
 	    
-	    Iterator<Map.Entry<String, Integer>> it2 = immutatud.entrySet().iterator();
+	    /*Iterator<Map.Entry<String, Integer>> it2= immutatud.entrySet().iterator();
 	    while (it2.hasNext()) {
 	    	Map.Entry<String, Integer> entry = it2.next();
 	    	Row r = sheet.createRow(startRow);
 	    	r.createCell(0).setCellValue(createHelper.createRichTextString(entry.getKey()));
 		    r.createCell(1).setCellValue(entry.getValue());
 		    startRow += 1;
-	    }
+	    }*/
 	    
 	    FileChooser fileChooser = new FileChooser();
 	    fileChooser.setTitle("Salvesta fail");
@@ -143,38 +148,61 @@ public class SettingsScene implements Scenable {
 	}
 	
 	private class OnButtonClicked implements EventHandler<ActionEvent> {
-		
-		int action;
-		
-		public OnButtonClicked(int action){
-			this.action = action;
-		}
+	
 
 		@Override
-		public void handle(ActionEvent arg0) {
-			int packId = Integer.parseInt(postTypes.getSelectionModel().getSelectedItem().substring(0, 1));
-			System.out.println(packId);
-			switch(action){
-				case 0:
-					//MysqlConnector.updateTavalisi(packId, amount);
-					break;
+		public void handle(ActionEvent e) {
+			
+			int id = postTypes1.getValue().getId();
+			int amt = Integer.parseInt(packAmount.getValue().toString());
+			
+			
+			
+			if(e.getSource() == lisaButton){
+				if(postTypes1.getValue() == null)
+					return;
+				if(MysqlConnector.isPackInImmutatud(id)){
+					MysqlConnector.incrementLaosImmutatudPack(id, amt);
+				} else {
+					MysqlConnector.addPackInToLaosImmutatud(id, amt);
+				}
+				Alert alert = new Alert(AlertType.CONFIRMATION, "Lisasin lattu " + amt + " pakki " + postTypes1.getValue().toString(), ButtonType.OK);
+				alert.show();
+			} else if(e.getSource() == eemaldaButton){
+				if(postTypes1.getValue() == null)
+					return;
+				if(MysqlConnector.isPackInImmutatud(id)){
+					MysqlConnector.decrementLaosImmutatudPack(id, amt);
+					Alert alert = new Alert(AlertType.CONFIRMATION, "Eemaldasin laost " + amt + " pakki " + postTypes1.getValue().toString(), ButtonType.OK);
+					alert.show();
+				}
+			} else if(e.getSource() == saveButton){
+				if(immutatudPacks.containsKey(postTypes2.getValue().getId())){
+					MysqlConnector.updateImmutatud(postTypes2.getValue().getId(), amountComboBox.getValue());
+				} 
+			} else if(e.getSource() == exportButton){
+				
 			}
 			 
 		}
 		
 	}
 	
-	private class OnComboBoxValueChange implements ChangeListener<String>{
+	private class OnComboBoxValueChange implements ChangeListener<Pack>{
 
 		@Override
-		public void changed(ObservableValue<? extends String> ov, String oldValue, String newValue) {
-			String postData = newValue.substring(2).trim();
-			for(Map.Entry<String, Integer> entry : tavaPacks.entrySet()){
-				if(entry.getKey().equals(postData)){
+		public void changed(ObservableValue<? extends Pack> ov, Pack oldValue, Pack newValue) {
+			
+			for(Map.Entry<Integer, Integer> entry : immutatudPacks.entrySet()){
+				if(entry.getKey().equals(newValue.getId())){
 					amountOfPacks.setText(String.valueOf(entry.getValue()));
+					return;
 				}
 			}
+			amountOfPacks.setText("0");
 		}
 		
 	}
+	
+	
 }

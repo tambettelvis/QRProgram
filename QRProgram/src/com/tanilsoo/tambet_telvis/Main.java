@@ -20,7 +20,7 @@ public class Main extends Application {
 	public static final int MAIN_WIDTH = 1120;
 	public static final int MAIN_HEIGHT = 680;
 	
-	public static MysqlConnector mysqlConnector;
+	static MysqlConnector mysqlConnector;
 	
 	public static Stage primaryStage;
 	Scene mainScene;
@@ -29,18 +29,16 @@ public class Main extends Application {
 	public static void main(String[] args){
 		mysqlConnector = new MysqlConnector();
 		
+		if(!MysqlConnector.isConnected()){
+			
+		}
+		
 		ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(3);
-		executor.scheduleAtFixedRate(new CheckPrinter(), 0L, 15000, TimeUnit.MILLISECONDS);
+		executor.scheduleAtFixedRate(new CheckPrinter(), 5000, 15000, TimeUnit.MILLISECONDS);
+		initialize();
 		
 		header = createHeader();
 		launch(args);
-		
-		if(!MysqlConnector.isConnected()){
-			/*String[] str = {"Jah", "Ei"};
-			JOptionPane.showOptionDialog(frame, "Ei saanud ¸hendust MySQL serveriga. Kas ¸hendan uuesti?", "Error", JOptionPane.YES_NO_OPTION,
-					JOptionPane.ERROR_MESSAGE,null, str, "Jah");*/
-		}
-		
 	}
 	
 
@@ -50,10 +48,14 @@ public class Main extends Application {
 		primaryStage.setTitle("Title");
 		
 		
-		//SceneBuilder.setNewScene(new MainScene());
-		SceneBuilder.setNewScene(new PrintScene());
+		SceneBuilder.setNewScene(new MainScene());
+		//SceneBuilder.setNewScene(new PrintScene());
 		Main.primaryStage.setOnCloseRequest(e -> closeApplication());
 		Main.primaryStage.show();
+	}
+	
+	public static void initialize(){
+		PackManager.refreshPacksList();
 	}
 	
 	private void closeApplication() {
@@ -70,6 +72,7 @@ public class Main extends Application {
 		primaryStage.setScene(scene);
 	}
 	
+	
 	private static BorderPane createHeader(){
 		BorderPane header = new BorderPane();
 		header.setStyle("-fx-background-color: #d9b38c;");
@@ -77,17 +80,16 @@ public class Main extends Application {
 		HBox headerBox = new HBox();
 		headerBox.setPadding(new Insets(20));
 		headerBox.setSpacing(20);
-		/*headerBox.getChildren().addAll(
+		headerBox.getChildren().addAll(
 				new HeaderButton("HOME", new MainScene()),
 				new HeaderButton("PRINDI", new PrintScene()),
-				new HeaderButton("LISA/EEMALDA", new AddRemovePacksScene()),
 				new HeaderButton("LADU", new LaoScene()),
 				new HeaderButton("T÷÷TAJAD", new EmployeeScene()),
 				new HeaderButton("TELLIMUSED", new OrdersScene()),
 				new HeaderButton("T÷÷DE NIMEKIRI", new JobsScene()),
 				new HeaderButton("SEADED", new SettingsScene()),
 				new HeaderButton("RAW DATA", new RawDataScene())
-				);*/
+				);
 		
 		
 		 headerBox.getChildren().addAll(

@@ -35,10 +35,12 @@ public class OutputPrinter implements Printable {
 	
 	String imageFileName;
 	String label;
+	String addtionalInfo;
 
-    public OutputPrinter(String imageFileName, String label){
+    public OutputPrinter(String imageFileName, String label, String additonalInfo){
     	this.imageFileName = imageFileName;
     	this.label = label;
+    	this.addtionalInfo = additonalInfo;
     }
 
 	@Override
@@ -73,8 +75,16 @@ public class OutputPrinter implements Printable {
 		g2d.setFont(new Font("Calibri", Font.PLAIN, 20));
 		g2d.setColor(Color.BLACK);
 		g2d.drawString(label, 0, 0);
+		
 		g2d.translate(QR_MARGIN_X, QR_MARGIN_Y);
 		g2d.drawImage(bi, 0, 0, null);
+		System.out.println(addtionalInfo);
+		if(addtionalInfo != null){
+			g2d.translate(40, bi.getHeight() + 7);
+			g2d.setFont(new Font("Calibri", Font.PLAIN, 16));
+			g2d.drawString(addtionalInfo, 0, 0);
+		}
+		
 		//g2d.draw(new Rectangle(0, 0, 100, 100));
 		//g2d.draw(new Rectangle2D.Double(1, 1, width - 1, height - 1));     
 		

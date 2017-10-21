@@ -2,16 +2,18 @@ package com.tanilsoo.tambet_telvis;
 
 import java.util.Map;
 
+import org.apache.poi.util.SystemOutLogger;
+
 import javafx.scene.Scene;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
-import javafx.scene.control.Button;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
+import javafx.scene.text.Font;
 
 public class LaoScene implements Scenable {
 	
@@ -22,55 +24,43 @@ public class LaoScene implements Scenable {
 		BorderPane header = Main.getHeader();
 		
 		TabPane tabPanel = new TabPane();
-		Tab tab1 = new Tab("Tavaline");
-		Tab tab2 = new Tab("Immutatud");
-		tab1.setClosable(false);
-		tab2.setClosable(false);
+		Tab tab = new Tab("Immutatud");
+		tab.setClosable(false);
 		
-		CategoryAxis xAxis1 = new CategoryAxis();
-		NumberAxis yAxis1 = new NumberAxis();
+		CategoryAxis xAxis = new CategoryAxis();
+		NumberAxis yAxis = new NumberAxis();
 		
-		CategoryAxis xAxis2 = new CategoryAxis();
-		NumberAxis yAxis2 = new NumberAxis();
-		
-		BarChart<String, Number> barChart1 = new BarChart<String, Number>(xAxis1, yAxis1);
-		barChart1.setTitle("Immutamata pakid");
-		BarChart<String, Number> barChart2 = new BarChart<String, Number>(xAxis2, yAxis2);
-		barChart2.setTitle("Immutatud pakid");
-		xAxis1.setLabel("Postid");
-		yAxis1.setLabel("Kokku");
-		xAxis2.setLabel("Postid");
-		yAxis2.setLabel("Kokku");
-		
-		//Immutamata
-		Map<String, Integer> tavaPacks = MysqlConnector.getLaosTavaPakke();
-		XYChart.Series series1 = new XYChart.Series();
-		for(Map.Entry<String, Integer> entry : tavaPacks.entrySet()){
-			if(entry.getValue() != 0){
-				series1.getData().add(new XYChart.Data(entry.getKey(), entry.getValue().intValue()));
-			}
-		}
-        
-		
+		BarChart<String, Number> barChart = new BarChart<String, Number>(xAxis, yAxis);
+	
+		barChart.setTitle("Immutatud pakid");
+		xAxis.tickLabelFontProperty().set(new Font("Calbiri", 15));
+		xAxis.setLabel("Postid");
+		yAxis.setLabel("Kokku");
 		
 		//Immutatud
-		Map<String, Integer> immutatudPacks = MysqlConnector.getLaosImmutatudPakke();
-		XYChart.Series series2 = new XYChart.Series();
-		for(Map.Entry<String, Integer> entry : immutatudPacks.entrySet()){
-			if(entry.getValue() != 0){
-				series2.getData().add(new XYChart.Data(entry.getKey(), entry.getValue().intValue()));
-			}
+		Map<Integer, Integer> immutatudPacks = MysqlConnector.getLaosImmutatudPakke();
+		XYChart.Series<String, Number> series = new XYChart.Series<>();
+		for(Map.Entry<Integer, Integer> entry : immutatudPacks.entrySet()){
+			Pack p = PackManager.getPackById(entry.getKey());
+			XYChart.Data<String, Number> data = new XYChart.Data<String, Number>(p.toString(), entry.getValue().intValue());
+			series.getData().add(data);
 		}
-        
+		
 		Scene scene = new Scene(borderPanel, Main.MAIN_WIDTH, Main.MAIN_HEIGHT);
-		barChart1.getData().add(series1);
-		barChart2.getData().add(series2);
-		tab1.setContent(barChart1);
-		tab2.setContent(barChart2);
-		tabPanel.getTabs().addAll(tab1, tab2);
+		barChart.getData().add(series);
+		tab.setContent(barChart);
+		tabPanel.getTabs().add(tab);
 		borderPanel.setCenter(tabPanel);
 		borderPanel.setTop(header);
 
+		for (XYChart.Series<String, Number> s : barChart.getData()) {
+			for (XYChart.Data<String, Number> item : s.getData()) {
+				Tooltip tip = new Tooltip(item.getXValue().toString() + "\n" + "Pakke: " + item.getYValue());
+				Tooltip.install(item.getNode(), tip);
+			
+			}
+		}
+		
 		return scene;
 	}
 	

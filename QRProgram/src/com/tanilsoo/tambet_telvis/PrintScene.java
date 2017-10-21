@@ -20,29 +20,26 @@ public class PrintScene implements Scenable {
 
 	ComboBox<Integer> amountComboBox;
 	
-	ListView<String> postTypesListView = new ListView<String>();
-	ObservableList<String> postTypes = FXCollections.observableArrayList();
+	ListView<Pack> postTypesListView = new ListView<Pack>();
+	ObservableList<Pack> postTypes = FXCollections.observableArrayList();
 	
 	Button printButton;
 	CheckBox defaultPrinterCheckBox;
 	
 	public PrintScene(){
-		try {
-		postTypes.addAll(OrdersScene.getPostTypeItems());
-		} catch(Exception e){
-			System.out.println("exception captured");
-		}
+		postTypes.addAll(PackManager.packs);
 		postTypesListView.setItems(postTypes);
 		postTypesListView.setCellFactory(cell -> {
-            return new ListCell<String>() {
+            return new ListCell<Pack>() {
                 @Override
-                protected void updateItem(String item, boolean empty) {
+                protected void updateItem(Pack item, boolean empty) {
                     super.updateItem(item, empty);
                     if (item != null) {
-                    	String[] split1 = item.split("\\.");
-                    	String[] split2 = split1[1].split("/");
-                        setText(split1[0] + ". " + "\t \t" + split2[1] + " / " + split2[0] + " / " + split2[2]);
-
+                    	if(item.getAdditionInformation() != null){
+                    		setText(String.format("%d / %d / %s - %s", item.getDiameter(), item.getLength(), item.getPuu(), item.getAdditionInformation()));
+                    	} else {
+                    		setText(String.format("%d / %d / %s", item.getDiameter(), item.getLength(), item.getPuu()));
+                    	}
                         setFont(Font.font(20));
                     }
                 }
@@ -84,14 +81,11 @@ public class PrintScene implements Scenable {
 	}
 	
 	public void onButtonClicked() {
-		String item = postTypesListView.getSelectionModel().getSelectedItem();
-		System.out.println(item);
-		if(item != null && !item.isEmpty() && 
-				amountComboBox.getValue() != null){
+		Pack item = postTypesListView.getSelectionModel().getSelectedItem();
+		if(item != null && amountComboBox.getValue() != null){
 			ConnectPrinter printer = new ConnectPrinter();
-			int packId = Integer.parseInt(item.split("\\.")[0]);
-			System.out.println(packId);
-			printer.printToPrinter(MysqlConnector.getFileNameById(packId), defaultPrinterCheckBox.isSelected(), amountComboBox.getValue());
+			printer.printToPrinter(item.getUniqueFile(), defaultPrinterCheckBox.isSelected(), amountComboBox.getValue());
+			System.out.println(item);
 			System.out.println("PRINTING...");
 		} else {
 		}

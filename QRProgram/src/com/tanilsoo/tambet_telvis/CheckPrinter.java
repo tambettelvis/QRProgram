@@ -1,5 +1,6 @@
 package com.tanilsoo.tambet_telvis;
 
+import java.net.SocketException;
 import java.util.List;
 
 public class CheckPrinter extends Thread {
