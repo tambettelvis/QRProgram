@@ -1,4 +1,4 @@
-package com.tanilsoo.tambet_telvis;
+package ee.tanilsoo.scene;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -13,6 +13,10 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
+import ee.tanilsoo.src.Main;
+import ee.tanilsoo.src.MysqlConnector;
+import ee.tanilsoo.src.Pack;
+import ee.tanilsoo.src.PackManager;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -106,24 +110,48 @@ public class SettingsScene implements Scenable {
 	    Map<Integer, Integer> immutatud = MysqlConnector.getLaosImmutatudPakke();
 	    
 
-	    int startRow = 3;
+	    int startRow = 2;
 	    
 	    Row row = sheet.createRow(startRow);
 	    row.createCell(0).setCellValue(createHelper.createRichTextString("Immutatud pakid"));
-	    startRow++;
+	    startRow +=2;
+	    sheet.createRow(startRow).createCell(0).setCellValue(createHelper.createRichTextString("Kuusk"));
+	    startRow +=2;
 	    Row titles = sheet.createRow(startRow);
-	    titles.createCell(0).setCellValue(createHelper.createRichTextString("Post Type"));
-	    titles.createCell(1).setCellValue(createHelper.createRichTextString("Amount"));
+	    titles.createCell(0).setCellValue(createHelper.createRichTextString("Pakk"));
+	    titles.createCell(1).setCellValue(createHelper.createRichTextString("Lisainfo"));
+	    titles.createCell(2).setCellValue(createHelper.createRichTextString("Kogus"));
 	    startRow++;
 	    
-	    /*Iterator<Map.Entry<String, Integer>> it2= immutatud.entrySet().iterator();
-	    while (it2.hasNext()) {
-	    	Map.Entry<String, Integer> entry = it2.next();
+	    Iterator<Map.Entry<Integer, Integer>> it1= immutatud.entrySet().iterator();
+	    while (it1.hasNext()) {
+	    	Map.Entry<Integer, Integer> entry = it1.next();
 	    	Row r = sheet.createRow(startRow);
-	    	r.createCell(0).setCellValue(createHelper.createRichTextString(entry.getKey()));
-		    r.createCell(1).setCellValue(entry.getValue());
+	    	Pack pack = PackManager.getPackById(entry.getKey());
+	    	if(pack.getPuu().equals("M"))
+	    		continue;
+	    	r.createCell(0).setCellValue(createHelper.createRichTextString(String.format("%d / %d / %s", pack.getDiameter(), pack.getLength(), pack.getPuu())));
+	    	r.createCell(1).setCellValue(createHelper.createRichTextString(pack.getAdditionInformation()));
+		    r.createCell(2).setCellValue(entry.getValue());
 		    startRow += 1;
-	    }*/
+	    }
+	    
+	    startRow += 2;
+	    sheet.createRow(startRow).createCell(0).setCellValue(createHelper.createRichTextString("Mänd"));
+	    startRow += 2;
+	    
+	    it1= immutatud.entrySet().iterator();// TODO Should fix this horrible mess.
+	    while (it1.hasNext()) {
+	    	Map.Entry<Integer, Integer> entry = it1.next();
+	    	Row r = sheet.createRow(startRow);
+	    	Pack pack = PackManager.getPackById(entry.getKey());
+	    	if(pack.getPuu().equals("K"))
+	    		continue;
+	    	r.createCell(0).setCellValue(createHelper.createRichTextString(String.format("%d / %d / %s", pack.getDiameter(), pack.getLength(), pack.getPuu())));
+	    	r.createCell(1).setCellValue(createHelper.createRichTextString(pack.getAdditionInformation()));
+		    r.createCell(2).setCellValue(entry.getValue());
+		    startRow += 1;
+	    }
 	    
 	    FileChooser fileChooser = new FileChooser();
 	    fileChooser.setTitle("Salvesta fail");

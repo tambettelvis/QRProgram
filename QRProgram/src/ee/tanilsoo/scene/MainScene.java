@@ -1,21 +1,23 @@
-package com.tanilsoo.tambet_telvis;
+package ee.tanilsoo.scene;
 
 import java.util.List;
+import java.util.Optional;
 
+import ee.tanilsoo.src.Graph;
+import ee.tanilsoo.src.Main;
+import ee.tanilsoo.src.MysqlConnector;
+import ee.tanilsoo.src.Pack;
+import ee.tanilsoo.src.PackManager;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleGroup;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.BorderStroke;
@@ -23,7 +25,6 @@ import javafx.scene.layout.BorderStrokeStyle;
 import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -112,7 +113,6 @@ public class MainScene implements Scenable {
 		graphPanel.populateData(MysqlConnector.getPackOperationsByAmount(3, 30));
 		
 		
-		
 		centerPanel.getChildren().addAll(graphPanel);
 		
 		//Print paneel
@@ -126,7 +126,7 @@ public class MainScene implements Scenable {
 		packAddGroup.getChildren().addAll(packageTitleLabel, packLine1, packLine2, packLine3, addPackButton);
 		employeeAddGroup.getChildren().addAll(addNewEmployeeTitleLabel, employeeLine1, addNewEmployeeBtn);
 		
-		
+	
 		mainPanel.setLeft(leftPanel);
 		mainPanel.setTop(header);
 		mainPanel.setCenter(centerPanel);
@@ -145,6 +145,12 @@ public class MainScene implements Scenable {
 		alert.show();
 	}
 	
+	private void clearFields(){
+		packageDiameter.setText("");
+		packageLength.setText("");
+		additionalInfo.setText("");
+	}
+	
 	
 	private class OnButtonClicked implements EventHandler<ActionEvent> {
 		
@@ -152,17 +158,12 @@ public class MainScene implements Scenable {
 		public String generateUniqueFile(){
 			String lastUniqueFile = PackManager.packs.get(PackManager.packs.size()-1).getUniqueFile();
 			int newUniqueFile = Integer.parseInt(lastUniqueFile.substring(2)) + 1;
-			for(Pack p : PackManager.packs){
-				System.out.println(p.getUniqueFile());
-			}
 			for(int i = 0; i < PackManager.packs.size(); i++){
 				if(PackManager.packs.get(i).getUniqueFile().equals("qr" + newUniqueFile)){
-					System.out.println(newUniqueFile);
 					newUniqueFile++;
 					i = -1;
 				}
 			}
-			System.out.println("Final QR " + newUniqueFile);
 			return "qr" + newUniqueFile;
 		}
 		
@@ -174,30 +175,47 @@ public class MainScene implements Scenable {
 					displayErrorMessage("Kontrolli väljasid.");
 					return;
 				}
+				int packLengthInt;
+				int packDiameterInt;
+				String addInfo = additionalInfo.getText().trim().isEmpty() ? null : additionalInfo.getText().trim();
+				try {
+					packLengthInt = Integer.parseInt(packageLength.getText());
+					packDiameterInt = Integer.parseInt(packageDiameter.getText());
+				} catch(NumberFormatException ex){
+					ex.printStackTrace();
+					displayErrorMessage("Sisesta number!");
+					return;
+				}
 				
-				int packLengthInt = Integer.parseInt(packageLength.getText());
-				int packDiameterInt = Integer.parseInt(packageDiameter.getText());
+				if(PackManager.doesPackExist(packDiameterInt, packLengthInt, addInfo)){
+					displayErrorMessage("Selline pakk on juba nimekirjas.");
+					return;
+				}
+				
+				List<Pack> possibleDuplicates = PackManager.getPacksBySize(packDiameterInt, packLengthInt);
+				System.out.println("Possible duplicates " + possibleDuplicates);
+				if(!possibleDuplicates.isEmpty()){
+					Alert alert = new Alert(AlertType.CONFIRMATION);
+					alert.setTitle("Hoiatus");
+					alert.setHeaderText("Võimalikud duplikaadid! Kas lisan?");
+					String alertContent = "";
+					for(Pack p : possibleDuplicates){
+						alertContent += p.toString() + "\n";
+					}
+					alert.setContentText(alertContent);
+					Optional<ButtonType> result = alert.showAndWait();
+					if(result.get() != ButtonType.OK){
+						return;
+					}
+				}
 				
 				PackManager.refreshPacksList();
 				
-				if(additionalInfo.getText().trim().equals("") || additionalInfo.getText() == null){
-					MysqlConnector.insertPactType(packLengthInt, packDiameterInt, "M", generateUniqueFile(), null);
-					MysqlConnector.insertPactType(packLengthInt, packDiameterInt, "K", generateUniqueFile(), null);
-					
-				} else {
-					MysqlConnector.insertPactType(packLengthInt, packDiameterInt, "M", generateUniqueFile(), additionalInfo.getText().trim());
-					MysqlConnector.insertPactType(packLengthInt, packDiameterInt, "K", generateUniqueFile(), additionalInfo.getText().trim());
-				}
-				
+				MysqlConnector.insertPactType(packLengthInt, packDiameterInt, "M", generateUniqueFile(), addInfo);
+				MysqlConnector.insertPactType(packLengthInt, packDiameterInt, "K", generateUniqueFile(), addInfo);
 				
 				displayConfirmationMessage("Pakk lisatud!");
-				//System.out.println("Button");
-				//updatePackagePanel();
-				/*
-				if(!checkIfPackageExists()){
-					updatePackagePanel();
-				}*/
-				
+				clearFields();
 				
 			} else if(e.getSource() == addNewEmployeeBtn){
 				

@@ -1,4 +1,4 @@
-package com.tanilsoo.tambet_telvis;
+package ee.tanilsoo.src;
 
 public class Order {
 	

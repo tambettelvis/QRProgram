@@ -1,4 +1,4 @@
-package com.tanilsoo.tambet_telvis;
+package ee.tanilsoo.src;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +13,10 @@ import javafx.util.Callback;
 public class PackManager {
 
 	public static List<Pack> packs = new ArrayList<Pack>();
+	
+	public static final int OPERATION_IMMUTAMATA = 2;
+	public static final int OPERATION_IMMUTATUD = 3;
+	public static final int OPERATION_LAADIMINE = 4;
 	
 	public static void addPack(Pack p){
 		packs.add(p);
@@ -66,6 +70,34 @@ public class PackManager {
 		postTypes.setCellFactory(cellFactory);
 		
 		return postTypes;
+	}
+	
+	public static boolean doesPackExist(int diameter, int length, String additonalInfo){
+		for(Pack p : packs){
+			if(p.getDiameter() == diameter && p.getLength() == length){
+				if(additonalInfo == null && p.getAdditionInformation() == null){
+					return true;
+				}
+				if(additonalInfo == null || p.getAdditionInformation() == null)
+					continue;
+				System.out.println(additonalInfo + " == " + p.getAdditionInformation());
+				if(additonalInfo.equals(p.getAdditionInformation()))
+					return true;
+			}
+		}
+		return false;
+	}
+	
+	public static List<Pack> getPacksBySize(int diameter, int length){
+		List<Pack> pList = new ArrayList<>();
+		for(Pack p : packs){
+			if(p.getAdditionInformation() == null)
+				continue;
+			if(p.getDiameter() == diameter && p.getLength() == length){
+				pList.add(p);
+			}
+		}
+		return pList;
 	}
 	
 	

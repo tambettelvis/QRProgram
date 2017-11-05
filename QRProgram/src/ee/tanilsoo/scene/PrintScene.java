@@ -1,6 +1,10 @@
-package com.tanilsoo.tambet_telvis;
+package ee.tanilsoo.scene;
 
 
+import ee.tanilsoo.src.ConnectPrinter;
+import ee.tanilsoo.src.Main;
+import ee.tanilsoo.src.Pack;
+import ee.tanilsoo.src.PackManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -27,6 +31,7 @@ public class PrintScene implements Scenable {
 	CheckBox defaultPrinterCheckBox;
 	
 	public PrintScene(){
+		PackManager.refreshPacksList();
 		postTypes.addAll(PackManager.packs);
 		postTypesListView.setItems(postTypes);
 		postTypesListView.setCellFactory(cell -> {

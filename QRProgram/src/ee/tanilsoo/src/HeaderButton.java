@@ -1,8 +1,10 @@
-package com.tanilsoo.tambet_telvis;
+package ee.tanilsoo.src;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import ee.tanilsoo.scene.Scenable;
+import ee.tanilsoo.scene.SceneBuilder;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.control.Label;

@@ -1,4 +1,4 @@
-package com.tanilsoo.tambet_telvis;
+package ee.tanilsoo.scene;
 
 
 import java.util.ArrayList;
@@ -7,6 +7,9 @@ import java.util.Map;
 
 import javax.naming.InitialContext;
 
+import ee.tanilsoo.src.Job;
+import ee.tanilsoo.src.Main;
+import ee.tanilsoo.src.MysqlConnector;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;

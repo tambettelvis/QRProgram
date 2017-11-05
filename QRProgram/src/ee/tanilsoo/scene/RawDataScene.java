@@ -1,7 +1,9 @@
-package com.tanilsoo.tambet_telvis;
+package ee.tanilsoo.scene;
 
 import java.util.List;
 
+import ee.tanilsoo.src.Main;
+import ee.tanilsoo.src.MysqlConnector;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;

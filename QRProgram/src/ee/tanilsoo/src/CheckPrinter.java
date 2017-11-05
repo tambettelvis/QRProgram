@@ -1,4 +1,4 @@
-package com.tanilsoo.tambet_telvis;
+package ee.tanilsoo.src;
 
 import java.net.SocketException;
 import java.util.List;

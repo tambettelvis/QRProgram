@@ -1,4 +1,4 @@
-package com.tanilsoo.tambet_telvis;
+package ee.tanilsoo.src;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -24,10 +24,10 @@ import javafx.scene.control.Alert.AlertType;
 
 public class MysqlConnector {
 
-	private static final String SERVER_IP = "90.190.115.141";
-	private static final String USER = "client";
-	private static final String PASSWORD = "banaan2";
-	private static final String DATABASE = "qrinfo";
+	private static final String SERVER_IP = "";
+	private static final String USER = "";
+	private static final String PASSWORD = "";
+	private static final String DATABASE = "";
 	
 	private static boolean connected = false;
 	private static Connection conn = null;
@@ -65,10 +65,16 @@ public class MysqlConnector {
 		return null;
 	}
 	
-	public static Map<String, Number> getPackOperationsByAmount(int operation, int days){
+	public static Map<String, Number> getPackOperationsByAmount(int operation, int days, int startClock, int endClock){
 		Map<String, Number> map = new LinkedHashMap<>();
-		String query = String.format("SELECT time, COUNT(time) FROM pack_operations WHERE operation=%d AND "
-				+ "time > DATE_SUB(NOW(), INTERVAL %d DAY) GROUP BY DAY(TIME)", operation, days);
+		String query;
+		if(startClock == -1 || endClock == -1){
+			query = String.format("SELECT time, COUNT(time) FROM pack_operations WHERE operation=%d AND "
+					+ "time > DATE_SUB(NOW(), INTERVAL %d DAY) GROUP BY DAY(TIME)", operation, days);
+		} else {
+			query = String.format("SELECT time, COUNT(time) FROM pack_operations WHERE operation=%d AND "
+					+ "time > DATE_SUB(NOW(), INTERVAL %d DAY) AND HOUR(time) >= %d AND HOUR(time) < %d GROUP BY DAY(TIME)", operation, days, startClock, endClock);
+		}
 		try {
 			LocalDate startDate = LocalDate.now().minusDays(days);
 			
@@ -90,6 +96,10 @@ public class MysqlConnector {
 			e.printStackTrace();
 		}
 		return map;
+	}
+	
+	public static Map<String, Number> getPackOperationsByAmount(int operation, int days){
+		return getPackOperationsByAmount(operation, days, -1, -1);
 	}
 	
 	public static Map<String, Integer> getJobData(){
@@ -344,10 +354,10 @@ public class MysqlConnector {
 	
 	public static Map<Integer, Integer> getLaosImmutatudPakke(){ 
 		//ID, AMOUNT
-		Map<Integer, Integer> result = new HashMap<>();
+		Map<Integer, Integer> result = new LinkedHashMap<>();
 		
 		try{
-			String query = "SELECT paki_id, amount FROM laos_immutatud_pakke";
+			String query = "SELECT paki_id, amount FROM laos_immutatud_pakke, post_type WHERE post_type.id=paki_id ORDER BY diameter, length";
 			ResultSet rows = statment.executeQuery(query);
 			while(rows.next()){
 				result.put(rows.getInt(1), rows.getInt(2));

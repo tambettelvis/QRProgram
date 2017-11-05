@@ -1,7 +1,9 @@
-package com.tanilsoo.tambet_telvis;
+package ee.tanilsoo.scene;
 
 import java.util.Map;
 
+import ee.tanilsoo.src.Main;
+import ee.tanilsoo.src.MysqlConnector;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.chart.BarChart;
@@ -13,6 +15,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
+/** Currently not used.*/
 public class EmployeeScene implements Scenable {
 	
 	Button dayButton;

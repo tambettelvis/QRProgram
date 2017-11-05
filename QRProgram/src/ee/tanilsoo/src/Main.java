@@ -1,8 +1,18 @@
-package com.tanilsoo.tambet_telvis;
+package ee.tanilsoo.src;
 
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import ee.tanilsoo.scene.EmployeeScene;
+import ee.tanilsoo.scene.JobsScene;
+import ee.tanilsoo.scene.LaoScene;
+import ee.tanilsoo.scene.MainScene;
+import ee.tanilsoo.scene.OrdersScene;
+import ee.tanilsoo.scene.PrintScene;
+import ee.tanilsoo.scene.RawDataScene;
+import ee.tanilsoo.scene.SceneBuilder;
+import ee.tanilsoo.scene.SettingsScene;
+import ee.tanilsoo.scene.ShiftScene;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -17,8 +27,8 @@ import javafx.stage.Stage;
 public class Main extends Application {
 
 	private static final long serialVersionUID = 1L;
-	public static final int MAIN_WIDTH = 1120;
-	public static final int MAIN_HEIGHT = 680;
+	public static int MAIN_WIDTH = 1280;
+	public static int MAIN_HEIGHT = 800;
 	
 	static MysqlConnector mysqlConnector;
 	
@@ -37,7 +47,6 @@ public class Main extends Application {
 		executor.scheduleAtFixedRate(new CheckPrinter(), 5000, 15000, TimeUnit.MILLISECONDS);
 		initialize();
 		
-		header = createHeader();
 		launch(args);
 	}
 	
@@ -47,7 +56,7 @@ public class Main extends Application {
 		Main.primaryStage = primaryStage;
 		primaryStage.setTitle("Title");
 		
-		
+		header = createHeader();
 		SceneBuilder.setNewScene(new MainScene());
 		//SceneBuilder.setNewScene(new PrintScene());
 		Main.primaryStage.setOnCloseRequest(e -> closeApplication());
@@ -84,7 +93,7 @@ public class Main extends Application {
 				new HeaderButton("HOME", new MainScene()),
 				new HeaderButton("PRINDI", new PrintScene()),
 				new HeaderButton("LADU", new LaoScene()),
-				new HeaderButton("T÷÷TAJAD", new EmployeeScene()),
+				new HeaderButton("VAHETUS", new ShiftScene()),
 				new HeaderButton("TELLIMUSED", new OrdersScene()),
 				new HeaderButton("T÷÷DE NIMEKIRI", new JobsScene()),
 				new HeaderButton("SEADED", new SettingsScene()),
@@ -99,7 +108,7 @@ public class Main extends Application {
 		
 		HBox imgPanel = new HBox();
 		imgPanel.setPadding(new Insets(10));
-		ImageView img = new ImageView(new Image("file:woodmaster.png"));
+		ImageView img = new ImageView(new Image("file:images/woodmaster.png"));
 		img.setFitWidth(85);
 		img.setFitHeight(43);
 		imgPanel.getChildren().add(img);
