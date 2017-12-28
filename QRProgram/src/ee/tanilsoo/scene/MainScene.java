@@ -135,12 +135,12 @@ public class MainScene implements Scenable {
 		return scene;
 	}
 	
-	public void displayErrorMessage(String message){
+	public static void displayErrorMessage(String message){
 		Alert alert = new Alert(AlertType.ERROR, message, ButtonType.OK);
 		alert.show();
 	}
 	
-	public void displayConfirmationMessage(String message){
+	public static void displayConfirmationMessage(String message){
 		Alert alert = new Alert(AlertType.CONFIRMATION, message, ButtonType.OK);
 		alert.show();
 	}

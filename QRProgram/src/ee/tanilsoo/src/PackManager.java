@@ -2,6 +2,7 @@ package ee.tanilsoo.src;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -22,9 +23,18 @@ public class PackManager {
 		packs.add(p);
 	}
 	
+	public static List<Pack> getPacks(){
+		refreshPacksList();
+		return packs;
+	}
+	
 	public static void refreshPacksList(){
 		packs.clear();
 		packs.addAll(MysqlConnector.getPostTypes());
+		
+		for(Pack p : packs){
+			p.setAmount(MysqlConnector.getPackAmount(p.getId()));
+		}
 	}
 	
 	public static Pack getPackById(int id){

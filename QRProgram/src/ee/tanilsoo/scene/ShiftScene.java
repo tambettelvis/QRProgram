@@ -12,7 +12,7 @@ import javafx.scene.layout.VBox;
 
 public class ShiftScene implements Scenable {
 
-	private static int firstShiftStart = 6;
+	private static int firstShiftStart = 5;
 	private static int firstShiftEnd = 15;
 	private static int secondShiftStart = 15;
 	private static int secondShiftEnd = 24;

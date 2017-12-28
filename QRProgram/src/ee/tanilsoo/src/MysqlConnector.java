@@ -24,10 +24,10 @@ import javafx.scene.control.Alert.AlertType;
 
 public class MysqlConnector {
 
-	private static final String SERVER_IP = "";
-	private static final String USER = "";
-	private static final String PASSWORD = "";
-	private static final String DATABASE = "";
+	private static final String SERVER_IP = "medesteetika.ee";
+	private static final String USER = "client";
+	private static final String PASSWORD = "banaan2";
+	private static final String DATABASE = "qrinfo";
 	
 	private static boolean connected = false;
 	private static Connection conn = null;
@@ -415,15 +415,10 @@ public class MysqlConnector {
 	public static List<String> getPrintingFiles(){
 		String query = "SELECT pack_id FROM print";
 		ResultSet rows = null;
+		List<String> results = new ArrayList<>();
 		try {
 			rows = statment.executeQuery(query);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		
-		List<String> results = new ArrayList<>();
-		
-		try {
+			
 			while(rows.next()){
 				results.add(rows.getString("pack_id"));
 			}
@@ -474,6 +469,36 @@ public class MysqlConnector {
 	
 	public static boolean isConnected(){
 		return connected;
+	}
+	
+	public static int getPackAmount(int id){
+		String query = "SELECT amount FROM laos_immutatud_pakke WHERE paki_id=" + id;
+		try{
+			ResultSet result = statment.executeQuery(query);
+			while(result.next()){
+				return result.getInt(1);
+			}
+		} catch(SQLException e){
+			e.printStackTrace();
+		}
+		return 0;
+	}
+	
+	public static void setPackAmount(int id, int amount){
+		String query1 = "SELECT amount FROM laos_immutatud_pakke WHERE paki_id=" + id;
+		try{
+			ResultSet result = statment.executeQuery(query1);
+			String query2 = null;
+			if(result.next()){
+				System.out.println("RESULT");
+				query2 = "UPDATE laos_immutatud_pakke SET amount=" + amount + " WHERE paki_id=" + id;
+			} else {
+				query2 = String.format("INSERT INTO laos_immutatud_pakke(paki_id, amount) VALUES(%d, %d)", id, amount);
+			}
+			insert(query2);
+		} catch(SQLException e){
+			e.printStackTrace();
+		}
 	}
 	
 }

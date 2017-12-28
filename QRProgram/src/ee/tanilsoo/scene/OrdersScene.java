@@ -135,7 +135,7 @@ public class OrdersScene implements Scenable {
 	
 	public static ObservableList<Integer> getComboBoxItems(int amount){
 		ObservableList<Integer> items = FXCollections.observableArrayList();
-		for(int i = 1; i <= amount; i++){
+		for(int i = 0; i <= amount; i++){
 			items.add(new Integer(i));
 		}
 		return items;

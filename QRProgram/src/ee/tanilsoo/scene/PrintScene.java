@@ -3,6 +3,7 @@ package ee.tanilsoo.scene;
 
 import ee.tanilsoo.src.ConnectPrinter;
 import ee.tanilsoo.src.Main;
+import ee.tanilsoo.src.MysqlConnector;
 import ee.tanilsoo.src.Pack;
 import ee.tanilsoo.src.PackManager;
 import javafx.collections.FXCollections;
@@ -31,7 +32,8 @@ public class PrintScene implements Scenable {
 	CheckBox defaultPrinterCheckBox;
 	
 	public PrintScene(){
-		PackManager.refreshPacksList();
+		if(MysqlConnector.isConnected())
+			PackManager.refreshPacksList();
 		postTypes.addAll(PackManager.packs);
 		postTypesListView.setItems(postTypes);
 		postTypesListView.setCellFactory(cell -> {

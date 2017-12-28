@@ -1,9 +1,8 @@
 package ee.tanilsoo.src;
 
+import java.io.IOException;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
-import ee.tanilsoo.scene.EmployeeScene;
 import ee.tanilsoo.scene.JobsScene;
 import ee.tanilsoo.scene.LaoScene;
 import ee.tanilsoo.scene.MainScene;
@@ -36,7 +35,7 @@ public class Main extends Application {
 	Scene mainScene;
 	static BorderPane header;
 	
-	public static void main(String[] args){
+	public static void main(String[] args) throws IOException{
 		mysqlConnector = new MysqlConnector();
 		
 		if(!MysqlConnector.isConnected()){
@@ -44,7 +43,7 @@ public class Main extends Application {
 		}
 		
 		ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(3);
-		executor.scheduleAtFixedRate(new CheckPrinter(), 5000, 15000, TimeUnit.MILLISECONDS);
+		//executor.scheduleAtFixedRate(new CheckPrinter(), 5000, 15000, TimeUnit.MILLISECONDS);
 		initialize();
 		
 		launch(args);
@@ -63,11 +62,22 @@ public class Main extends Application {
 		Main.primaryStage.show();
 	}
 	
-	public static void initialize(){
-		PackManager.refreshPacksList();
+	public static void initialize() throws IOException{
+		if(MysqlConnector.isConnected()){
+			PackManager.refreshPacksList();
+		} else {
+			System.out.println("Loading from file...");
+			FileHandler.loadFromFile();
+		}
 	}
 	
 	private void closeApplication() {
+		try {
+			System.out.println("Saving to file...");
+			FileHandler.saveToFile(PackManager.packs);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		Platform.exit();
 		System.exit(0);
 	}

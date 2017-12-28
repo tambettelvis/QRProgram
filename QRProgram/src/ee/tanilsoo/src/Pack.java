@@ -1,8 +1,5 @@
 package ee.tanilsoo.src;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class Pack {
 
 	private int id;
@@ -12,6 +9,8 @@ public class Pack {
 	private String additionInformation;
 	private String uniqueFile;
 	private String puu;
+	
+	private int amount = 1;
 	
 	public Pack(int id, int length, int diameter, String uniqueFile, String puu) {
 		this.id = id;
@@ -92,7 +91,13 @@ public class Pack {
 	public void setPuu(String puu) {
 		this.puu = puu;
 	}
-	
-	
-	
+
+	public int getAmount() {
+		return amount;
+	}
+
+	public void setAmount(int amount) {
+		this.amount = amount;
+	}
+
 }

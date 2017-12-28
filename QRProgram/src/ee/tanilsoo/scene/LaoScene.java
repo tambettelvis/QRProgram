@@ -6,6 +6,8 @@ import ee.tanilsoo.src.Main;
 import ee.tanilsoo.src.MysqlConnector;
 import ee.tanilsoo.src.Pack;
 import ee.tanilsoo.src.PackManager;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.chart.CategoryAxis;
@@ -14,10 +16,14 @@ import javafx.scene.chart.StackedBarChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.Tooltip;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.text.Font;
 
 public class LaoScene implements Scenable {
@@ -33,7 +39,6 @@ public class LaoScene implements Scenable {
 		TabPane tabPanel = new TabPane();
 		Tab tab = new Tab("Immutatud");
 		tab.setClosable(false);
-		
 		
 		NumberAxis xAxis = new NumberAxis();
 		CategoryAxis yAxis = new CategoryAxis();
@@ -70,7 +75,6 @@ public class LaoScene implements Scenable {
 		
 		barChart.setOnMouseDragged(mouseEventHandler);
 		barChart.setOnScroll(scrollEventHandler);
-		
 		return scene;
 	}
 	
